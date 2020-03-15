@@ -1,0 +1,30 @@
+main {
+    display: grid;
+    gap: 1rem;
+    grid-template:
+        "header"
+        "cards-section"
+        "footer";
+}
+
+$CARDS_COL_COUNT: 2;
+
+section.cards {
+    margin: 0 1rem;
+    grid-area: cards-section;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: 0.5fr 1.5fr;
+    grid-template-areas:
+        "aside article";
+
+    aside {
+        grid-area: aside;
+    }
+
+    article {
+        grid-area: article;
+        display: grid;
+        grid-template: repeat($CARDS_COL_COUNT, 1fr) / repeat($CARDS_COL_COUNT, 1fr);
+    }
+}

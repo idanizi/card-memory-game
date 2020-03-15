@@ -3,6 +3,7 @@ import Footer from './components/Footer'
 import { useStoreActions, useStoreState } from 'easy-peasy'
 import { useCards } from './hooks'
 import './App.scss'
+import { CARDS_COUNT } from './constants';
 
 export default function App() {
   const { isGameOver } = useStoreState(state => state.cards)
@@ -23,6 +24,8 @@ export default function App() {
 
 function GameOver() {
 
+  const { playAgain } = useStoreActions(actions => actions.cards)
+
   const winningPlayer = 1;
 
   return <section className="game-over">
@@ -33,7 +36,7 @@ function GameOver() {
       Player {winningPlayer} won!
     </h4>
     <article>
-      <button>
+      <button onClick={playAgain}>
         Play Again?
       </button>
     </article>
@@ -50,7 +53,7 @@ function CardsSection() {
 
   return (
     <section className="cards">
-      <article>
+      <article style={{gridTemplate: `repeat(${Math.sqrt(CARDS_COUNT)}, 1fr) / repeat(${Math.sqrt(CARDS_COUNT)}, 1fr)`}}>
         <Cards />
       </article>
       <aside>

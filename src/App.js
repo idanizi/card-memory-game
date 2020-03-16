@@ -46,11 +46,11 @@ function GameOver() {
 
 function CardsSection() {
   console.log('render cards section')
-  const { isShowToast, toastText, cards } = useStoreState(state => state.cards)
+  const { isShowToast, toastText, items } = useStoreState(state => state.cards)
 
   const { fetchCards } = useStoreActions(actions => actions.cards)
 
-  console.log({cards})
+  console.log({items})
 
   React.useEffect(() => {
     fetchCards()
@@ -58,15 +58,15 @@ function CardsSection() {
 
   return (
     <section className="cards">
-      <article style={{ gridTemplate: `repeat(${Math.ceil(cards.length ** 0.5)}, 1fr) / repeat(${Math.ceil(cards.length ** 0.5)}, 1fr)` }}>
-        {cards.map((card, key) =>
+      <article style={{ gridTemplate: `repeat(${Math.ceil(items.length ** 0.5)}, 1fr) / repeat(${Math.ceil(items.length ** 0.5)}, 1fr)` }}>
+        {items.map((card, key) =>
           <Card {...card} key={key} />)}
       </article>
       <aside>
         {isShowToast && <Toast text={toastText} />}
       </aside>
       <p>
-        {cards.filter(x => x.isUp).length}
+        {items.filter(x => x.isUp).length}
       </p>
     </section>
   );

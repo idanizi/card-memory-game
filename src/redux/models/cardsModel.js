@@ -2,17 +2,18 @@ import { action, thunk, actionOn, thunkOn } from 'easy-peasy'
 import { TOAST_TIMEOUT, CARDS_COUNT } from '../../constants'
 import _ from 'lodash'
 
-export let cards = []
+export let items = []
+export let toastText = '' 
 
 export const flipCard = action((state, payload) => {
     const index = payload;
-    const card = state.cards.find(x => x.index === index)
+    const card = state.items.find(x => x.index === index)
     card.isUp = true;
 })
 
 export const removeCards = action((state, payload) => {
     const cardsToRemove = payload;
-    _.remove(state.cards, x => cardsToRemove.map(c => c.index).includes(x.index))
+    _.remove(state.items, x => cardsToRemove.map(c => c.index).includes(x.index))
 })
 
 export const showToast = action((state, payload) => {
@@ -48,12 +49,12 @@ export const coverCards = action((state, payload) => {
 //     async (actions, target, { getState }) => {
 //         const state = getState();
 //         const index = target.payload;
-//         const card = state.cards.find(x => x.index === index)
+//         const card = state.items.find(x => x.index === index)
 
-//         const twinCard = state.cards.find(x =>
+//         const twinCard = state.items.find(x =>
 //             x !== card && x.id === card.id)
 
-//         const upCards = state.cards.filter(x => x.isUp);
+//         const upCards = state.items.filter(x => x.isUp);
 
 //         if (upCards.length >= 2) {
 //             if (twinCard?.isUp && card.isUp) {
@@ -94,13 +95,13 @@ export const fetchCards = thunk(async (actions, payload) => {
 })
 
 export const setCards = action((state, payload) => {
-    state.cards = payload;
+    state.items = payload;
 })
 
 export const checkIfGameIsOver = actionOn(
     actions => actions.removeCards,
     state => {
-        if (state.cards.length === 0)
+        if (state.items.length === 0)
             state.isGameOver = true;
     }
 )

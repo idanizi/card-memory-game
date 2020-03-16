@@ -14,7 +14,8 @@ export const flipCard = action((state, payload) => {
 
 export const removeCards = action((state, payload) => {
     const cardsToRemove = payload;
-    _.remove(state.items, x => cardsToRemove.map(c => c.index).includes(x.index))
+    cardsToRemove.forEach(card => card.isActive = false)
+    // _.remove(state.items, x => cardsToRemove.map(c => c.index).includes(x.index))
 })
 
 export const showToast = action((state, payload) => {
@@ -55,7 +56,7 @@ export const onFlipCard = thunkOn(
         const twinCard = state.items.find(x =>
             x !== card && x.id === card.id)
 
-        const upCards = state.items.filter(x => x.isUp);
+        const upCards = state.items.filter(x => x.isUp && x.isActive);
 
         if (upCards.length >= 2) {
             if (twinCard?.isUp && card.isUp) {
@@ -77,6 +78,7 @@ class Card {
         this.id = id;
         this.index = index;
         this.url = url;
+        this.isActive = true;
     }
 }
 
@@ -84,10 +86,14 @@ export const fetchCards = thunk(async (actions, payload) => {
     const response = await fetch(
         `https://api.unsplash.com/photos/`
         + `?client_id=${process.env.REACT_APP_UNSPLASH_ACCESS_KEY}`
-        + `&per_page=${CARDS_COUNT}`)
+        + `&per_page=${CARDS_COUNT / 2}`)
     if (response.ok) {
-        const result = (await response.json()).map((photo, index) => new Card(photo.id, index, photo.urls.small))
-        actions.setCards(result)
+
+        const result = await response.json()
+        let cards = result.map((photo, index) => new Card(photo.id, index, photo.urls.small))
+        cards = [...cards, ...result.map((photo, index) => new Card(photo.id, index + cards.length, photo.urls.small))]
+        cards = _.shuffle(cards)
+        actions.setCards(cards)
     } else {
         console.log(
             `response is not ok` +
@@ -109,6 +115,7 @@ export const checkIfGameIsOver = actionOn(
 
 export const resetGame = action(state => {
     state.isGameOver = false;
+    state.items = [];
 })
 
 export const playAgain = thunk(actions => {
@@ -140,9 +147,9 @@ export const onLoading = actionOn(
 export let isGameOver = false;
 export let isShowToast = false;
 
-export default {
-    isGameOver, isShowToast, checkIfGameIsOver,
-    clearToast, coverCards, fetchCards, flipCard, items,
-    loading, onLoading, onShowToast, playAgain, removeCards,
-    resetGame, setCards, showToast, toastText, onFlipCard,
-}
+// export default {
+//     isGameOver, isShowToast, checkIfGameIsOver,
+//     clearToast, coverCards, fetchCards, flipCard, items,
+//     loading, onLoading, onShowToast, playAgain, removeCards,
+//     resetGame, setCards, showToast, toastText, onFlipCard,
+// }

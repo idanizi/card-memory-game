@@ -1,8 +1,8 @@
 import { createStore } from 'easy-peasy'
-import cardsModel from './models/cardsModel'
+import * as cardsModel from './models/cardsModel'
 
 const model = {
-    cards: cardsModel,
+    cards: {...cardsModel},
 }
 
 const store = createStore(model)

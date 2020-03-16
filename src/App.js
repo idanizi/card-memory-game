@@ -63,9 +63,6 @@ function CardsSection() {
       <aside>
         {isShowToast && <Toast text={toastText} />}
       </aside>
-      <p>
-        {items.filter(x => x.isUp).length}
-      </p>
     </section>
   );
 }
@@ -74,14 +71,14 @@ function Toast({ text }) {
   return <span>{text}</span>
 }
 
-const Card = React.memo(({ index, id, isUp, url }) => {
+const Card = React.memo(({ index, id, isUp, url, isActive }) => {
   console.log('render Card')
   const { flipCard } = useStoreActions(actions => actions.cards)
   const cover = '#';
 
   return (
     <button className="card"
-      onClick={() => flipCard(index)}>
+      onClick={() => flipCard(index)} disabled={!isActive}>
       {isUp
         ? <img src={url} alt={id} />
         : cover}

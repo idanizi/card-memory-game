@@ -46,7 +46,7 @@ function GameOver() {
 
 function CardsSection() {
   console.log('render cards section')
-  const { isShowToast, toastText, items } = useStoreState(state => state.cards)
+  const { isShowToast, toastText, items, moves } = useStoreState(state => state.cards)
 
   const { fetchCards } = useStoreActions(actions => actions.cards)
 
@@ -61,7 +61,13 @@ function CardsSection() {
           <Card {...card} key={key} />)}
       </article>
       <aside>
-        {isShowToast && <Toast text={toastText} />}
+        <h5 style={{display:'grid', gap:"1em", gridTemplate: '1fr / 1fr 1fr'}}>
+          <strong>moves:</strong>
+          <span>{moves}</span>
+        </h5>
+        <h4>
+          {isShowToast && <Toast text={toastText} />}
+        </h4>
       </aside>
     </section>
   );

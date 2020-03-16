@@ -3,19 +3,24 @@ import { TOAST_TIMEOUT, CARDS_COUNT } from '../../constants'
 import _ from 'lodash'
 
 export let items = []
-export let toastText = '' 
+export let toastText = ''
 
 export const flipCard = action((state, payload) => {
+    if (state.items.filter(x => x.isActive && x.isUp).length >= 2)
+        return;
+
+    state.moves++;
+
     const index = payload;
     const card = state.items.find(x => x.index === index)
     card.isUp = true;
-    return {...state, items: [...state.items]}
+
+    return { ...state, items: [...state.items] }
 })
 
 export const removeCards = action((state, payload) => {
     const cardsToRemove = payload;
     cardsToRemove.forEach(card => card.isActive = false)
-    // _.remove(state.items, x => cardsToRemove.map(c => c.index).includes(x.index))
 })
 
 export const showToast = action((state, payload) => {
@@ -69,7 +74,6 @@ export const onFlipCard = thunkOn(
                 actions.coverCards(upCards)
             }
         }
-        return;
     })
 
 class Card {
@@ -108,7 +112,7 @@ export const setCards = action((state, payload) => {
 export const checkIfGameIsOver = actionOn(
     actions => actions.removeCards,
     state => {
-        if (state.items.length === 0)
+        if (state.items.filter(x => x.isActive).length === 0)
             state.isGameOver = true;
     }
 )
@@ -146,10 +150,4 @@ export const onLoading = actionOn(
 
 export let isGameOver = false;
 export let isShowToast = false;
-
-// export default {
-//     isGameOver, isShowToast, checkIfGameIsOver,
-//     clearToast, coverCards, fetchCards, flipCard, items,
-//     loading, onLoading, onShowToast, playAgain, removeCards,
-//     resetGame, setCards, showToast, toastText, onFlipCard,
-// }
+export let moves = 0;

@@ -120,6 +120,7 @@ export const checkIfGameIsOver = actionOn(
 export const resetGame = action(state => {
     state.isGameOver = false;
     state.items = [];
+    state.moves = 0;
 })
 
 export const playAgain = thunk(actions => {

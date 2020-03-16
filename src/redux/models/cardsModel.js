@@ -9,6 +9,7 @@ export const flipCard = action((state, payload) => {
     const index = payload;
     const card = state.items.find(x => x.index === index)
     card.isUp = true;
+    return {...state, items: [...state.items]}
 })
 
 export const removeCards = action((state, payload) => {
@@ -44,31 +45,31 @@ export const coverCards = action((state, payload) => {
     cardsToCover.forEach(card => card.isUp = false)
 })
 
-// export const onFlipCard = thunkOn(
-//     actions => actions.flipCard,
-//     async (actions, target, { getState }) => {
-//         const state = getState();
-//         const index = target.payload;
-//         const card = state.items.find(x => x.index === index)
+export const onFlipCard = thunkOn(
+    actions => actions.flipCard,
+    async (actions, target, { getState }) => {
+        const state = getState();
+        const index = target.payload;
+        const card = state.items.find(x => x.index === index)
 
-//         const twinCard = state.items.find(x =>
-//             x !== card && x.id === card.id)
+        const twinCard = state.items.find(x =>
+            x !== card && x.id === card.id)
 
-//         const upCards = state.items.filter(x => x.isUp);
+        const upCards = state.items.filter(x => x.isUp);
 
-//         if (upCards.length >= 2) {
-//             if (twinCard?.isUp && card.isUp) {
-//                 actions.showToast(`Found ${card.id}!`)
-//                 await delay(TOAST_TIMEOUT / 2)
-//                 actions.removeCards([card, twinCard])
-//             } else {
-//                 actions.showToast(`Aww... try again!`)
-//                 await delay(TOAST_TIMEOUT * 0.7)
-//                 actions.coverCards(upCards)
-//             }
-//         }
-//         return;
-//     })
+        if (upCards.length >= 2) {
+            if (twinCard?.isUp && card.isUp) {
+                actions.showToast(`Found ${card.id}!`)
+                await delay(TOAST_TIMEOUT / 2)
+                actions.removeCards([card, twinCard])
+            } else {
+                actions.showToast(`Aww... try again!`)
+                await delay(TOAST_TIMEOUT * 0.7)
+                actions.coverCards(upCards)
+            }
+        }
+        return;
+    })
 
 class Card {
     constructor(id, index, url) {
@@ -138,3 +139,10 @@ export const onLoading = actionOn(
 
 export let isGameOver = false;
 export let isShowToast = false;
+
+export default {
+    isGameOver, isShowToast, checkIfGameIsOver,
+    clearToast, coverCards, fetchCards, flipCard, items,
+    loading, onLoading, onShowToast, playAgain, removeCards,
+    resetGame, setCards, showToast, toastText, onFlipCard,
+}

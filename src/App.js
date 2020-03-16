@@ -50,8 +50,6 @@ function CardsSection() {
 
   const { fetchCards } = useStoreActions(actions => actions.cards)
 
-  console.log({items})
-
   React.useEffect(() => {
     fetchCards()
   }, [fetchCards])

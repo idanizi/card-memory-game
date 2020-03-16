@@ -3,7 +3,7 @@ import Footer from './components/Footer'
 import { useStoreActions, useStoreState } from 'easy-peasy'
 import { useCards } from './hooks'
 import './App.scss'
-import { CARDS_COUNT } from './constants';
+import _ from 'lodash'
 
 export default function App() {
   const { isGameOver } = useStoreState(state => state.cards)
@@ -36,7 +36,7 @@ function GameOver() {
       Player {winningPlayer} won!
     </h4>
     <article>
-      <button onClick={playAgain}>
+      <button onClick={() => playAgain()}>
         Play Again?
       </button>
     </article>
@@ -45,20 +45,29 @@ function GameOver() {
 }
 
 function CardsSection() {
-  const { cards } = useCards()
-  const { isShowToast, toastText } = useStoreState(state => state.cards)
+  console.log('render cards section')
+  const { isShowToast, toastText, cards } = useStoreState(state => state.cards)
 
-  const Cards = () =>
-    cards.map((props, key) => <Card {...props} key={key} />)
+  const { fetchCards } = useStoreActions(actions => actions.cards)
+
+  console.log({cards})
+
+  React.useEffect(() => {
+    fetchCards()
+  }, [fetchCards])
 
   return (
     <section className="cards">
-      <article style={{gridTemplate: `repeat(${Math.sqrt(CARDS_COUNT)}, 1fr) / repeat(${Math.sqrt(CARDS_COUNT)}, 1fr)`}}>
-        <Cards />
+      <article style={{ gridTemplate: `repeat(${Math.ceil(cards.length ** 0.5)}, 1fr) / repeat(${Math.ceil(cards.length ** 0.5)}, 1fr)` }}>
+        {cards.map((card, key) =>
+          <Card {...card} key={key} />)}
       </article>
       <aside>
         {isShowToast && <Toast text={toastText} />}
       </aside>
+      <p>
+        {cards.filter(x => x.isUp).length}
+      </p>
     </section>
   );
 }
@@ -67,14 +76,17 @@ function Toast({ text }) {
   return <span>{text}</span>
 }
 
-function Card({ index, id, isUp }) {
+const Card = React.memo(({ index, id, isUp, url }) => {
+  console.log('render Card')
   const { flipCard } = useStoreActions(actions => actions.cards)
   const cover = '#';
 
   return (
     <button className="card"
       onClick={() => flipCard(index)}>
-      {isUp ? id : cover}
+      {isUp
+        ? <img src={url} alt={id} />
+        : cover}
     </button>
   )
-}
+})

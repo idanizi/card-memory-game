@@ -1,0 +1,2 @@
+GET https://api.unsplash.com/photos/
+?client_id={{$dotenv REACT_APP_UNSPLASH_ACCESS_KEY}}

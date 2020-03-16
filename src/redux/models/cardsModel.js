@@ -1,13 +1,13 @@
 import { action, thunk, actionOn, thunkOn } from 'easy-peasy'
-import { CARDS_COUNT, TOAST_TIMEOUT } from '../../constants'
+import { TOAST_TIMEOUT, CARDS_COUNT } from '../../constants'
 import _ from 'lodash'
 
-export const cards = []
+export let cards = []
 
 export const flipCard = action((state, payload) => {
     const index = payload;
     const card = state.cards.find(x => x.index === index)
-    card.isUp = !card.isUp;
+    card.isUp = true;
 })
 
 export const removeCards = action((state, payload) => {
@@ -38,43 +38,59 @@ export const onShowToast = thunkOn(
     }
 )
 
-export const onFlipCard = thunkOn(
-    actions => actions.flipCard,
-    async (actions, target, { getState }) => {
-        const state = getState();
-        const index = target.payload;
-        const card = state.cards.find(x => x.index === index)
-        const twinCard = state.cards.find(x =>
-            x !== card && x.id === card.id)
-        const upCards = state.cards.filter(x => x.isUp);
-        if (upCards.length === 2) {
-            if (twinCard?.isUp && card.isUp) {
-                actions.showToast(`Found ${card.id}!`)
-                await delay(TOAST_TIMEOUT / 2)
-                actions.removeCards([card, twinCard])
-            } else {
-                actions.showToast(`Aww... try again!`)
-                await delay(TOAST_TIMEOUT * 0.7)
-                upCards.forEach(x => x.isUp = false)
-            }
-        }
-    })
+export const coverCards = action((state, payload) => {
+    const cardsToCover = payload;
+    cardsToCover.forEach(card => card.isUp = false)
+})
+
+// export const onFlipCard = thunkOn(
+//     actions => actions.flipCard,
+//     async (actions, target, { getState }) => {
+//         const state = getState();
+//         const index = target.payload;
+//         const card = state.cards.find(x => x.index === index)
+
+//         const twinCard = state.cards.find(x =>
+//             x !== card && x.id === card.id)
+
+//         const upCards = state.cards.filter(x => x.isUp);
+
+//         if (upCards.length >= 2) {
+//             if (twinCard?.isUp && card.isUp) {
+//                 actions.showToast(`Found ${card.id}!`)
+//                 await delay(TOAST_TIMEOUT / 2)
+//                 actions.removeCards([card, twinCard])
+//             } else {
+//                 actions.showToast(`Aww... try again!`)
+//                 await delay(TOAST_TIMEOUT * 0.7)
+//                 actions.coverCards(upCards)
+//             }
+//         }
+//         return;
+//     })
+
+class Card {
+    constructor(id, index, url) {
+        this.isUp = false;
+        this.id = id;
+        this.index = index;
+        this.url = url;
+    }
+}
 
 export const fetchCards = thunk(async (actions, payload) => {
-    // todo: fetch cards
-    const keys = Array(CARDS_COUNT)
-        .fill(0)
-        .map((x, i) => i % Math.floor(CARDS_COUNT / 2))
-
-    const result = Array(CARDS_COUNT)
-        .fill(0)
-        .map((x, i) => ({
-            index: i,
-            id: keys.splice(_.random(keys.length - 1), 1)[0],
-            isUp: false,
-        }))
-
-    actions.setCards(result)
+    const response = await fetch(
+        `https://api.unsplash.com/photos/`
+        + `?client_id=${process.env.REACT_APP_UNSPLASH_ACCESS_KEY}`
+        + `&per_page=${CARDS_COUNT}`)
+    if (response.ok) {
+        const result = (await response.json()).map((photo, index) => new Card(photo.id, index, photo.urls.small))
+        actions.setCards(result)
+    } else {
+        console.log(
+            `response is not ok` +
+            `status: ${response.status} ${response.text}`)
+    }
 })
 
 export const setCards = action((state, payload) => {

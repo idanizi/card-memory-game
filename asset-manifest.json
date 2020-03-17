@@ -1,22 +1,22 @@
 {
   "files": {
-    "main.css": "/card-memory-game/static/css/main.0aa0e6ac.chunk.css",
-    "main.js": "/card-memory-game/static/js/main.372c3f3a.chunk.js",
-    "main.js.map": "/card-memory-game/static/js/main.372c3f3a.chunk.js.map",
-    "runtime-main.js": "/card-memory-game/static/js/runtime-main.472aa481.js",
-    "runtime-main.js.map": "/card-memory-game/static/js/runtime-main.472aa481.js.map",
-    "static/js/2.bc94ff58.chunk.js": "/card-memory-game/static/js/2.bc94ff58.chunk.js",
-    "static/js/2.bc94ff58.chunk.js.map": "/card-memory-game/static/js/2.bc94ff58.chunk.js.map",
+    "main.css": "/card-memory-game/static/css/main.c4427843.chunk.css",
+    "main.js": "/card-memory-game/static/js/main.0cb149f9.chunk.js",
+    "main.js.map": "/card-memory-game/static/js/main.0cb149f9.chunk.js.map",
+    "runtime-main.js": "/card-memory-game/static/js/runtime-main.d7cc7cfc.js",
+    "runtime-main.js.map": "/card-memory-game/static/js/runtime-main.d7cc7cfc.js.map",
+    "static/js/2.b363930b.chunk.js": "/card-memory-game/static/js/2.b363930b.chunk.js",
+    "static/js/2.b363930b.chunk.js.map": "/card-memory-game/static/js/2.b363930b.chunk.js.map",
     "index.html": "/card-memory-game/index.html",
-    "precache-manifest.ab27f75b981953d7a1da6b6f9e4e1b36.js": "/card-memory-game/precache-manifest.ab27f75b981953d7a1da6b6f9e4e1b36.js",
+    "precache-manifest.d3b2011e75442ea1dcb6d6e38bcad142.js": "/card-memory-game/precache-manifest.d3b2011e75442ea1dcb6d6e38bcad142.js",
     "service-worker.js": "/card-memory-game/service-worker.js",
-    "static/css/main.0aa0e6ac.chunk.css.map": "/card-memory-game/static/css/main.0aa0e6ac.chunk.css.map",
-    "static/js/2.bc94ff58.chunk.js.LICENSE.txt": "/card-memory-game/static/js/2.bc94ff58.chunk.js.LICENSE.txt"
+    "static/css/main.c4427843.chunk.css.map": "/card-memory-game/static/css/main.c4427843.chunk.css.map",
+    "static/js/2.b363930b.chunk.js.LICENSE.txt": "/card-memory-game/static/js/2.b363930b.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
-    "static/js/runtime-main.472aa481.js",
-    "static/js/2.bc94ff58.chunk.js",
-    "static/css/main.0aa0e6ac.chunk.css",
-    "static/js/main.372c3f3a.chunk.js"
+    "static/js/runtime-main.d7cc7cfc.js",
+    "static/js/2.b363930b.chunk.js",
+    "static/css/main.c4427843.chunk.css",
+    "static/js/main.0cb149f9.chunk.js"
   ]
 }

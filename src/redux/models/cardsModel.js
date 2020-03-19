@@ -25,12 +25,12 @@ export const removeCards = action((state, payload) => {
 
 export const showToast = action((state, payload) => {
     state.isShowToast = true;
-    state.toastText = payload;
+    state.toastText = payload.text;
+    state.isGood = payload.isGood;
 })
 
 export const clearToast = action(state => {
     state.isShowToast = false;
-    state.toastText = '';
 })
 
 const delay = timeout =>
@@ -65,11 +65,11 @@ export const onFlipCard = thunkOn(
 
         if (upCards.length >= 2) {
             if (twinCard?.isUp && card.isUp) {
-                actions.showToast(`Found ${card.id}!`)
+                actions.showToast({text: `Found ${card.description}!`, isGood: true})
                 await delay(TOAST_TIMEOUT / 2)
                 actions.removeCards([card, twinCard])
             } else {
-                actions.showToast(`Aww... try again!`)
+                actions.showToast({text: `Aww... try again!`, isGood: false})
                 await delay(TOAST_TIMEOUT * 0.7)
                 actions.coverCards(upCards)
             }
@@ -77,12 +77,13 @@ export const onFlipCard = thunkOn(
     })
 
 class Card {
-    constructor(id, index, url) {
+    constructor(id, index, url, description) {
         this.isUp = false;
         this.id = id;
         this.index = index;
         this.url = url;
         this.isActive = true;
+        this.description = description;
     }
 }
 
@@ -94,8 +95,8 @@ export const fetchCards = thunk(async (actions, payload) => {
     if (response.ok) {
 
         const result = await response.json()
-        let cards = result.map((photo, index) => new Card(photo.id, index, photo.urls.small))
-        cards = [...cards, ...result.map((photo, index) => new Card(photo.id, index + cards.length, photo.urls.small))]
+        let cards = result.map((photo, index) => new Card(photo.id, index, photo.urls.small, photo.alt_description))
+        cards = [...cards, ...result.map((photo, index) => new Card(photo.id, index + cards.length, photo.urls.small, photo.alt_description))]
         cards = _.shuffle(cards)
         actions.setCards(cards)
     } else {

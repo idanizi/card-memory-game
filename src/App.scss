@@ -14,7 +14,7 @@ section.cards {
     grid-area: cards-section;
     display: grid;
     gap: 1rem;
-    grid-template-columns: 0.5fr 1.5fr;
+    grid-template-columns: 0.5fr auto;
     grid-template-areas:
         "aside article";
 
@@ -23,6 +23,7 @@ section.cards {
     }
 
     article {
+        justify-self: center;
         grid-area: article;
         display: grid;
         gap: 1rem;
@@ -30,19 +31,4 @@ section.cards {
     }
 }
 
-img{
-    width: auto;
-    height: auto;
-    max-height: 100%;
-    max-width: 100%;
-    // border-radius: 50%;
-}
 
-button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 0.5em;
-    width: 5rem;
-    height: 5rem;
-}

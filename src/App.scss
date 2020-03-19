@@ -7,6 +7,12 @@ main {
         "footer";
 }
 
+header {
+    grid-area: header;
+    display: flex;
+    justify-content: center;
+}
+
 $CARDS_COL_COUNT: 2;
 
 section.cards {
@@ -14,7 +20,7 @@ section.cards {
     grid-area: cards-section;
     display: grid;
     gap: 1rem;
-    grid-template-columns: 0.5fr auto;
+    grid-template-columns: auto 1.5fr;
     grid-template-areas:
         "aside article";
 

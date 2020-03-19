@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import Paper from '@material-ui/core/Paper'
 import { useStoreActions } from 'easy-peasy'
 
 function Card({ index, id, isUp, url, isActive, description }) {

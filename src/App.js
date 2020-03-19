@@ -8,7 +8,7 @@ import './App.scss'
 
 export default function App() {
   const { isGameOver } = useStoreState(state => state.cards)
-
+  
   return (
     <main>
       <header>

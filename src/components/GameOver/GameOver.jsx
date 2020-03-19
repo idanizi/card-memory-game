@@ -1,5 +1,6 @@
 import React from 'react'
 import { useStoreActions } from 'easy-peasy'
+import Button from '@material-ui/core/Button'
 
 export default function GameOver() {
 
@@ -15,9 +16,9 @@ export default function GameOver() {
         Player {winningPlayer} won!
       </h4>
       <article>
-        <button onClick={() => playAgain()}>
+        <Button color="primary" variant="contained" onClick={() => playAgain()}>
           Play Again?
-        </button>
+        </Button>
       </article>
     </section>
   

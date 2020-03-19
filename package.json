@@ -4,7 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test-client": "npm --prefix=client test",
+    "test-server": "npm --prefix=server test",
+    "test": "run-s test-client test-server",
+    "dev-server": "npm --prefix=server run dev",
+    "dev-client": "npm run start-client",
+    "dev": "run-p dev-server dev-client",
+    "start-server": "npm --prefix=server start",
+    "start-client": "npm --prefix=client start",
+    "start": "run-p start-server start-client"
   },
   "keywords": [],
   "author": "",

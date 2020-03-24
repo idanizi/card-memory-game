@@ -7,9 +7,14 @@ import GameOver from './components/GameOver'
 import './App.scss'
 
 import io from 'socket.io-client'
+import Login from './components/Login';
 
 export default function App() {
   const { isGameOver } = useStoreState(state => state.cards)
+  
+  const user = {isConnected: false} // TODO: clear mock
+
+  if(!user.isConnected) return <Login />
 
   return (
     <main>

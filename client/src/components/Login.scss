@@ -1,0 +1,51 @@
+main.login {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+
+    & > :first-child {
+        flex: 1;
+    }
+
+    section {
+       display: flex;
+       flex-direction: column;
+       justify-content: center;
+       align-items: center;
+    }
+
+    article {
+        display: grid;
+        justify-items: center;
+        align-items: center;
+        grid-template:
+            "header header"0.5fr "text-input submit-button"1fr / 1fr auto;
+        gap: 1em;
+    }
+
+    h1 {
+        font-size: 2em;
+        margin: 0;
+        line-height: normal;
+    }
+
+    header {
+        grid-area: header;
+    }
+
+    footer {
+        align-self: flex-end;
+        justify-self: flex-end;
+    }
+
+    .text-input {
+        grid-area: text-input;
+    }
+
+    .submit-button {
+        grid-area: submit-button;
+    }
+}

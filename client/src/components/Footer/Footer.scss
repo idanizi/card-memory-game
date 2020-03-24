@@ -1,8 +1,17 @@
+@import "../../vars.scss";
+
 footer {
-    background: #eee;
+    background: $light_orange;
     text-align: center;
     grid-area: footer;
-    // position: absolute;
-    // bottom: 0;
     width: 100%;
+    font-family: $font_annie;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 1.5em;
+
+    text-align: center;
+    text-transform: uppercase;
+
+    color: #000000;
 }

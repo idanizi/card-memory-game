@@ -42,6 +42,10 @@ function SocketTest() {
 
   useEffect(() => {
     if (socket) {
+      socket.once('connect', () => {
+        console.log('client is connected', socket.connected)
+      })
+
       socket.on('message', function (message) {
         console.log(message);
       })

@@ -8,6 +8,7 @@ export const roomId = null;
 export const roomName = null;
 export const availableRooms = [];
 export const socket = null;
+export const isConnected = false;
 
 export const fetchAvailableRooms = thunk(async (actions, payload) => {
     console.log(`[${getFunctionName()}] in`)
@@ -29,6 +30,10 @@ export const fetchAvailableRooms = thunk(async (actions, payload) => {
     }
 })
 
+export const setIsConnected = action((state, payload) => {
+    state.isConnected = payload;
+})
+
 export const setAvailableRooms = action((state, payload) => {
     state.availableRooms = payload;
 })
@@ -47,6 +52,10 @@ export const setRoomName = action((state, payload) => {
 
 export const connect = thunk((actions, payload) => {
     const socket = io();
+
+    socket.on('connect', () => {
+        actions.setIsConnected(socket.connected)
+    })
 
     socket.on('message', function (message) {
         console.log(message);

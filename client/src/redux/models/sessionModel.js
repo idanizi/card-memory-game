@@ -1,5 +1,6 @@
 import { thunk, thunkOn, action, actionOn } from 'easy-peasy'
 import _ from 'lodash'
+import io from 'socket.io-client'
 import { getFunctionName } from '../../util'
 
 export const userName = null;
@@ -42,4 +43,38 @@ export const setRoomId = action((state, payload) => {
 
 export const setRoomName = action((state, payload) => {
     state.roomName = payload;
+})
+
+export const connect = thunk((actions, payload) => {
+    const socket = io();
+
+    socket.on('message', function (message) {
+        console.log(message);
+    })
+
+    socket.on('roomId', roomId => {
+        setRoomId(roomId);
+    })
+
+    actions.setSocket(socket);
+
+})
+
+export const createRoom = action((state, payload) => {
+    const { roomName, userName } = payload;
+    if (state.socket)
+        state.socket.emit('create_room', roomName, userName)
+})
+
+export const leaveRoom = action((state, payload) => {
+    const { roomId, socket } = state;
+    if (socket && roomId)
+        socket.emit('leave_room', roomId);
+})
+
+export const joinRoom = action((state, payload) => {
+    const { roomId } = payload;
+    const { socket, userName } = state;
+    if (socket)
+        socket.emit('join_room', roomId, userName);
 })

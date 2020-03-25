@@ -1,3 +1,5 @@
+@import "./vars.scss";
+
 main {
     display: grid;
     gap: 1rem;
@@ -5,6 +7,25 @@ main {
         "header"
         "cards-section"
         "footer";
+
+    background-color: $light_blue;
+}
+
+button, .btn {
+    background-color: $purple_ !important;
+}
+
+h1 {
+    font-family: $font_raj;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 8vw;
+    margin: 0;
+
+    text-align: center;
+    text-transform: uppercase;
+
+    color: #333333;
 }
 
 header {
@@ -36,5 +57,3 @@ section.cards {
         grid-template: repeat($CARDS_COL_COUNT, 1fr) / repeat($CARDS_COL_COUNT, 1fr);
     }
 }
-
-

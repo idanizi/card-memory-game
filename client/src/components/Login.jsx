@@ -12,8 +12,8 @@ export default function Login() {
                     <header>
                         <h1>Card Memory Game</h1>
                     </header>
-                    <TextField className="input-text" label={"User Name"} variant="outlined" />
-                    <Button className="submit-button" variant="contained" color="primary">Enter</Button>
+                    <TextField className="text-input" label={"User Name"} variant="outlined" />
+                    <Button className="btn submit-button" variant="contained" color="primary">Enter</Button>
                 </article>
             </section>
             <Footer />

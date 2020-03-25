@@ -12,7 +12,7 @@ import Login from './components/Login';
 export default function App() {
   const { isGameOver } = useStoreState(state => state.cards)
   
-  const user = {isConnected: false} // TODO: clear mock
+  const user = {isConnected: true} // TODO: clear mock
 
   if(!user.isConnected) return <Login />
 

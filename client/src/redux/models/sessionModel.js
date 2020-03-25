@@ -50,6 +50,10 @@ export const setRoomName = action((state, payload) => {
     state.roomName = payload;
 })
 
+export const setUserName = action((state, payload) => {
+    state.userName = payload;
+})
+
 export const connect = thunk((actions, payload) => {
     const socket = io();
 

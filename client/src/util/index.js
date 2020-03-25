@@ -1,3 +1,9 @@
 export function getFunctionName(){
-    return arguments.callee.name;
+    try{
+       return getFunctionName.caller.name;
+    }
+
+    catch (error) {
+        console.log(error.message)
+    }
 }

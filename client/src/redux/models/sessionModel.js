@@ -3,30 +3,28 @@ import _ from 'lodash'
 import io from 'socket.io-client'
 import { getFunctionName } from '../../util'
 
-export const userName = null;
-export const roomId = null;
-export const roomName = null;
+export const userName = '';
+export const roomId = '';
+export const roomName = '';
 export const availableRooms = [];
 export const socket = null;
 export const isConnected = false;
 
 export const fetchAvailableRooms = thunk(async (actions, payload) => {
-    console.log(`[${getFunctionName()}] in`)
+    console.log(`[fetchAvailableRooms] in`)
 
     try {
-        const response = await fetch('/api/rooms', {
-            headers: { "Content Type": "application/json" },
-        })
+        const response = await fetch('/api/rooms')
 
         if (response.ok) {
             const result = await response.json();
             actions.setAvailableRooms(result.available)
         } else {
-            console.log(`[${getFunctionName()}]`, { response })
+            console.log(`[fetchAvailableRooms]`, { response })
         }
     }
     catch (error) {
-        console.log(`[${getFunctionName()}]`, { error })
+        console.log(`[fetchAvailableRooms]`, { error })
     }
 })
 
@@ -66,7 +64,7 @@ export const connect = thunk((actions, payload) => {
     })
 
     socket.on('roomId', roomId => {
-        setRoomId(roomId);
+        actions.setRoomId(roomId);
     })
 
     actions.setSocket(socket);
@@ -86,7 +84,7 @@ export const leaveRoom = action((state, payload) => {
 })
 
 export const joinRoom = action((state, payload) => {
-    const { roomId } = payload;
+    const roomId = payload;
     const { socket, userName } = state;
     if (socket)
         socket.emit('join_room', roomId, userName);

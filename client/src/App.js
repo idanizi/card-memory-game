@@ -5,16 +5,13 @@ import CardsSection from './components/CardsSection'
 import Moves from './components/Moves'
 import GameOver from './components/GameOver'
 import './App.scss'
-
-import io from 'socket.io-client'
 import Login from './components/Login';
 
 export default function App() {
   const { isGameOver } = useStoreState(state => state.cards)
+  const user = useStoreState(state => state.session)
 
-  const user = { isConnected: true } // TODO: clear mock
-
-  if (!user.isConnected) return <Login />
+  if (!user.isConnected || !user.isInsideRoom || user.isAwaitingOtherPlayer) return <Login />
 
   return (
     <main>
@@ -26,7 +23,7 @@ export default function App() {
           ? <GameOver />
           : <CardsSection />
       }
-      <SocketTest />
+      {/* <SocketTest /> */}
       <Footer />
     </main>
   );

@@ -36,7 +36,7 @@ io.on('connection', function (socket) {
         roomId = uuid();
         rooms[roomId] = { users: [{ id: socket.id, name: userName }], name: roomName };
         socket.join(roomId);
-        socket.emit('roomId', roomId);
+        socket.emit('roomId', roomId, rooms[roomId].users.length);
         socket.send(`joined room ${roomName} = ${roomId}, awaiting another player to join`)
     })
 
@@ -45,8 +45,11 @@ io.on('connection', function (socket) {
 
         if (roomId in rooms) {
             socket.join(roomId)
-            socket.emit('roomId', roomId);
             rooms[roomId].users.push({ id: socket.id, name: userName })
+            
+            socket.emit('roomId', roomId, rooms[roomId].users.length);
+            socket.broadcast.to(roomId).emit('other_player_join', socket.id, userName, rooms[roomId].users.length);
+
             socket.broadcast.to(roomId).send(`${userName} joined!`)
             socket.send(`you joined to room ${rooms[roomId].name}.`)
         } else {

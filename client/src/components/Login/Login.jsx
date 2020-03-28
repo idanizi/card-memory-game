@@ -5,7 +5,6 @@ import './Login.scss'
 import Footer from '../Footer'
 import { useStoreActions, useStoreState } from 'easy-peasy'
 import { v4 as uuid } from 'uuid'
-import * as ClipboardJS from 'clipboard'
 
 function UserNameInput() {
     const { userName, } = useStoreState(state => state.session)
@@ -51,25 +50,25 @@ function InviteSection() {
         }
     }, [user.isInsideRoom])
 
-    let clipboard;
-    React.useEffect(() => {
-        clipboard = new ClipboardJS(ref.current, {
-            text: () => user.roomId
-        })
-            .on('success', e => {
-                const { action, text, trigger } = e;
-                console.log('clipboard copy success', { action, text, trigger })
-            })
-            .on('error', e => {
-                const { action, text, trigger } = e;
-                console.log('clipboard error', { action, text, trigger })
-            })
+    // let clipboard;
+    // React.useEffect(() => {
+    //     clipboard = new ClipboardJS(ref.current, {
+    //         text: () => user.roomId
+    //     })
+    //         .on('success', e => {
+    //             const { action, text, trigger } = e;
+    //             console.log('clipboard copy success', { action, text, trigger })
+    //         })
+    //         .on('error', e => {
+    //             const { action, text, trigger } = e;
+    //             console.log('clipboard error', { action, text, trigger })
+    //         })
 
-        return () => {
-            clipboard.destroy()
-            console.log(`[useEffect] clipboard destroyed`)
-        }
-    }, [ref, user.roomId])
+    //     return () => {
+    //         clipboard.destroy()
+    //         console.log(`[useEffect] clipboard destroyed`)
+    //     }
+    // }, [ref, user.roomId])
 
 
 
@@ -79,7 +78,14 @@ function InviteSection() {
     }
 
     const handleInvite = () => {
-
+        const text = window.location.href + user.roomId;
+        navigator.clipboard.writeText(text)
+            .then(() => {
+                console.log('copied!', { text })
+            })
+            .catch(error => {
+                console.log(error)
+            })
     }
 
     return (

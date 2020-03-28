@@ -1,6 +1,7 @@
 import { action, thunk, actionOn, thunkOn } from 'easy-peasy'
 import { TOAST_TIMEOUT, CARDS_COUNT } from '../../constants'
 import _ from 'lodash'
+import {delay} from '../../util'
 
 export let items = []
 export let toastText = ''
@@ -32,11 +33,6 @@ export const showToast = action((state, payload) => {
 export const clearToast = action(state => {
     state.isShowToast = false;
 })
-
-const delay = timeout =>
-    new Promise(resolve => setTimeout(() => {
-        resolve()
-    }, timeout))
 
 export const onShowToast = thunkOn(
     actions => actions.showToast,

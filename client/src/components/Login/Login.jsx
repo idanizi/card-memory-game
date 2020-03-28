@@ -1,11 +1,13 @@
-import React, { useEffect } from 'react'
+import React, { useState, useRef } from 'react'
 import TextField from '@material-ui/core/TextField'
 import Button from '@material-ui/core/Button'
-import Popper from '@material-ui/core/Popper'
+import Tooltip from 'react-bootstrap/Tooltip'
+import Overlay from 'react-bootstrap/Overlay'
 import './Login.scss'
 import Footer from '../Footer'
 import { useStoreActions, useStoreState } from 'easy-peasy'
 import { v4 as uuid } from 'uuid'
+import { delay } from '../../util'
 
 function UserNameInput() {
     const { userName, } = useStoreState(state => state.session)
@@ -35,23 +37,42 @@ function UserNameInput() {
     )
 }
 
-function CopyNotificationPopper({ anchorEl }) {
-    const open = Boolean(anchorEl);
-    const Arrow = () => <div></div>
+function CopyButtonWithNotificationPopper({ onClick }) {
+    const [show, setShow] = useState(false);
+    const target = useRef(null);
+    const timeout = 2e3;
+
+    const handleClick = async () => {
+        onClick()
+        setShow(true)
+        await delay(timeout)
+        setShow(false)
+    }
+
     return (
-        <Popper open={open} anchorEl={anchorEl} modifiers={{}}>
-            <div style={{backgroundColor: "#555", border:"1px solid #222", color: "#fff", padding:"0.5em"}}>copied!</div>
-        </Popper>
-    )
+        <>
+            <Button
+                className="btn invite" variant="contained" color="primary"
+                ref={target} onClick={handleClick}>
+                Invite
+            </Button>
+            <Overlay target={target.current} show={show} placement="right">
+                {(props) => (
+                    <Tooltip id="overlay-example" {...props}>
+                        Copied!
+                    </Tooltip>
+                )}
+            </Overlay>
+        </>
+    );
 }
+
 
 function InviteSection() {
     const [requiredRoomId] = window.location.pathname.match(/[^\/]+/g) || [];
 
     const user = useStoreState(state => state.session)
     const { joinRoom, createRoom } = useStoreActions(actions => actions.session)
-
-    const ref = React.useRef(null)
 
     React.useEffect(() => {
         if (!user.isInsideRoom) {
@@ -79,11 +100,7 @@ function InviteSection() {
 
     return (
         <article className="invite">
-            <Button ref={ref} className="btn invite" variant="contained" color="primary"
-                onClick={handleInvite}>
-                Invite
-            </Button>
-            <CopyNotificationPopper anchorEl={ref.current} />
+            <CopyButtonWithNotificationPopper onClick={handleInvite} />
         </article>
     )
 }

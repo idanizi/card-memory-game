@@ -1,8 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import App from './App';
-import { StoreProvider, useStoreActions, useStoreState } from 'easy-peasy'
+import { StoreProvider } from 'easy-peasy'
 import store from './redux/store'
 
 ReactDOM.render(

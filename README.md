@@ -6,10 +6,15 @@ see this [project definition](https://github.com/florinpop17/app-ideas/blob/mast
 see [live demo](http://idanizi.github.io/card-memory-game)
 
 ## Getting started
-Use npm or yarn:
+
 ```
-yarn install
-yarn start
+npm install
+npm start
+```
+
+Running server with nodemon:
+```
+npm run dev
 ```
 
 ## Author

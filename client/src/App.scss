@@ -4,10 +4,10 @@ main {
     display: grid;
     gap: 1rem;
     grid-template:
-        "header"
-        "cards-section"
-        "footer";
-
+        "header" auto
+        "cards-section" 1fr
+        "footer" auto;
+    height: 100vh;
     background-color: $light_blue;
 }
 
@@ -39,6 +39,8 @@ $CARDS_COL_COUNT: 2;
 section.cards {
     margin: 0 1rem;
     grid-area: cards-section;
+    align-content: center;
+
     display: grid;
     gap: 1rem;
     grid-template-columns: auto 1.5fr;

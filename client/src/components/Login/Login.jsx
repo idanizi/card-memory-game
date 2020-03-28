@@ -2,9 +2,10 @@ import React, { useEffect } from 'react'
 import TextField from '@material-ui/core/TextField'
 import Button from '@material-ui/core/Button'
 import './Login.scss'
-import Footer from './Footer'
+import Footer from '../Footer'
 import { useStoreActions, useStoreState } from 'easy-peasy'
-import {v4 as uuid} from 'uuid'
+import { v4 as uuid } from 'uuid'
+import * as ClipboardJS from 'clipboard'
 
 function UserNameInput() {
     const { userName, } = useStoreState(state => state.session)
@@ -40,21 +41,50 @@ function InviteSection() {
     const user = useStoreState(state => state.session)
     const { joinRoom, createRoom } = useStoreActions(actions => actions.session)
 
+    const ref = React.useRef(null)
+
+    React.useEffect(() => {
+        if (!user.isInsideRoom) {
+            const roomName = uuid()
+            createRoom(roomName)
+            console.log({ roomName })
+        }
+    }, [user.isInsideRoom])
+
+    let clipboard;
+    React.useEffect(() => {
+        clipboard = new ClipboardJS(ref.current, {
+            text: () => user.roomId
+        })
+            .on('success', e => {
+                const { action, text, trigger } = e;
+                console.log('clipboard copy success', { action, text, trigger })
+            })
+            .on('error', e => {
+                const { action, text, trigger } = e;
+                console.log('clipboard error', { action, text, trigger })
+            })
+
+        return () => {
+            clipboard.destroy()
+            console.log(`[useEffect] clipboard destroyed`)
+        }
+    }, [ref, user.roomId])
+
+
+
     if (requiredRoomId && user.isConnected && !user.isInsideRoom) {
         joinRoom(requiredRoomId);
         return <div className="spinner">Joining Room...</div> // todo: spinner
     }
 
     const handleInvite = () => {
-        // todo: copy to clipboard
-        const roomName = uuid()
-        createRoom(roomName)
-        console.log({ roomName })
+
     }
 
     return (
         <article className="invite">
-            <Button className="btn invite" variant="contained" color="primary"
+            <Button ref={ref} className="btn invite" variant="contained" color="primary"
                 onClick={handleInvite}>
                 Invite
             </Button>

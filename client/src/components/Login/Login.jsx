@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import TextField from '@material-ui/core/TextField'
 import Button from '@material-ui/core/Button'
+import Popper from '@material-ui/core/Popper'
 import './Login.scss'
 import Footer from '../Footer'
 import { useStoreActions, useStoreState } from 'easy-peasy'
@@ -34,6 +35,15 @@ function UserNameInput() {
     )
 }
 
+function CopyNotificationPopper({ anchorEl }) {
+    const open = Boolean(anchorEl);
+    return (
+        <Popper open={open} anchorEl={anchorEl}>
+            <div style={{backgroundColor: "#555", border:"1px solid #222", color: "#fff", padding:"0.5em"}}>copied!</div>
+        </Popper>
+    )
+}
+
 function InviteSection() {
     const [requiredRoomId] = window.location.pathname.match(/[^\/]+/g) || [];
 
@@ -49,28 +59,6 @@ function InviteSection() {
             console.log({ roomName })
         }
     }, [user.isInsideRoom])
-
-    // let clipboard;
-    // React.useEffect(() => {
-    //     clipboard = new ClipboardJS(ref.current, {
-    //         text: () => user.roomId
-    //     })
-    //         .on('success', e => {
-    //             const { action, text, trigger } = e;
-    //             console.log('clipboard copy success', { action, text, trigger })
-    //         })
-    //         .on('error', e => {
-    //             const { action, text, trigger } = e;
-    //             console.log('clipboard error', { action, text, trigger })
-    //         })
-
-    //     return () => {
-    //         clipboard.destroy()
-    //         console.log(`[useEffect] clipboard destroyed`)
-    //     }
-    // }, [ref, user.roomId])
-
-
 
     if (requiredRoomId && user.isConnected && !user.isInsideRoom) {
         joinRoom(requiredRoomId);
@@ -94,6 +82,7 @@ function InviteSection() {
                 onClick={handleInvite}>
                 Invite
             </Button>
+            <CopyNotificationPopper anchorEl={ref.current} />
         </article>
     )
 }

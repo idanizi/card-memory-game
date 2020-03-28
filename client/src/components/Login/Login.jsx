@@ -37,8 +37,9 @@ function UserNameInput() {
 
 function CopyNotificationPopper({ anchorEl }) {
     const open = Boolean(anchorEl);
+    const Arrow = () => <div></div>
     return (
-        <Popper open={open} anchorEl={anchorEl}>
+        <Popper open={open} anchorEl={anchorEl} modifiers={{}}>
             <div style={{backgroundColor: "#555", border:"1px solid #222", color: "#fff", padding:"0.5em"}}>copied!</div>
         </Popper>
     )

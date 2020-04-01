@@ -26,6 +26,10 @@ app.get('/api/rooms', function (req, res) {
     res.json({ all_rooms: rooms, available: getAvailableRooms(rooms) });
 });
 
+app.get('/api/cards' , (req, res) => {
+    res.end('todo')
+})
+
 io.on('connection', function (socket) {
     console.log(`user ${socket.id} connected`);
     socket.send(`welcome, user id: ${socket.id}`)

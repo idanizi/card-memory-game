@@ -84,20 +84,13 @@ class Card {
 }
 
 export const fetchCards = thunk(async (actions, payload) => {
-    const response = await fetch(
-        `https://api.unsplash.com/photos/`
-        + `?client_id=${process.env.REACT_APP_UNSPLASH_ACCESS_KEY}`
-        + `&per_page=${CARDS_COUNT / 2}`)
+    const response = await fetch(`/api/cards`)
     if (response.ok) {
-
-        const result = await response.json()
-        let cards = result.map((photo, index) => new Card(photo.id, index, photo.urls.small, photo.alt_description))
-        cards = [...cards, ...result.map((photo, index) => new Card(photo.id, index + cards.length, photo.urls.small, photo.alt_description))]
-        cards = _.shuffle(cards)
-        actions.setCards(cards)
+        const result = await response.json();
+        actions.setCards(result)
     } else {
         console.log(
-            `response is not ok` +
+            `response is not ok ` +
             `status: ${response.status} ${response.text}`)
     }
 })

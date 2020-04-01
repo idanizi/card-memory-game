@@ -3,6 +3,7 @@ import TextField from '@material-ui/core/TextField'
 import Button from '@material-ui/core/Button'
 import Tooltip from 'react-bootstrap/Tooltip'
 import Overlay from 'react-bootstrap/Overlay'
+import Spinner from 'react-bootstrap/Spinner'
 import './Login.scss'
 import Footer from '../Footer'
 import { useStoreActions, useStoreState } from 'easy-peasy'
@@ -74,6 +75,8 @@ function InviteSection() {
     const user = useStoreState(state => state.session)
     const { joinRoom, createRoom } = useStoreActions(actions => actions.session)
 
+    const [joining, setJoining] = useState(false)
+
     React.useEffect(() => {
         if (!user.isInsideRoom) {
             const roomName = uuid()
@@ -82,10 +85,12 @@ function InviteSection() {
         }
     }, [user.isInsideRoom])
 
-    if (requiredRoomId && user.isConnected && !user.isInsideRoom) {
-        joinRoom(requiredRoomId);
-        return <div className="spinner">Joining Room...</div> // todo: spinner
-    }
+    React.useEffect(() => {
+        if (requiredRoomId && user.isConnected && !user.isInsideRoom) {
+            setJoining(true);
+            joinRoom(requiredRoomId);
+        }
+    })
 
     const handleInvite = () => {
         const text = window.location.href + user.roomId;
@@ -100,14 +105,18 @@ function InviteSection() {
 
     return (
         <article className="invite">
-            <CopyButtonWithNotificationPopper onClick={handleInvite} />
+            {joining ?
+                <Spinner animation="border" />
+                :
+                <CopyButtonWithNotificationPopper onClick={handleInvite} />
+            }
         </article>
     )
 }
 
 export default function Login() {
 
-    const user = useStoreState(state => state.session)
+    const isConnected = useStoreState(state => state.session.isConnected)
 
     return (
         <main className="login">
@@ -115,7 +124,7 @@ export default function Login() {
                 <header>
                     <h1>Card Memory Game</h1>
                 </header>
-                {user.isConnected ?
+                {isConnected ?
                     <InviteSection />
                     :
                     <UserNameInput />

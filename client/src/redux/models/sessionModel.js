@@ -102,7 +102,7 @@ export const connect = thunk((actions) => {
 })
 
 export const createRoom = action((state, payload) => {
-    const { roomName } = payload;
+    const roomName = payload;
     const { userName } = state;
     if (state.socket)
         state.socket.emit('create_room', roomName, userName)

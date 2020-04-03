@@ -78,7 +78,7 @@ function InviteSection() {
     const [joining, setJoining] = useState(false)
 
     React.useEffect(() => {
-        if (!user.isInsideRoom) {
+        if (!user.isInsideRoom && !requiredRoomId) {
             const roomName = uuid()
             createRoom(roomName)
             console.log({ roomName })

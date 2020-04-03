@@ -1,7 +1,7 @@
 import { action, thunk, actionOn, thunkOn } from 'easy-peasy'
 import { TOAST_TIMEOUT, CARDS_COUNT } from '../../constants'
 import _ from 'lodash'
-import {delay} from '../../util'
+import { delay } from '../../util'
 
 export let items = []
 export let toastText = ''
@@ -61,11 +61,11 @@ export const onFlipCard = thunkOn(
 
         if (upCards.length >= 2) {
             if (twinCard?.isUp && card.isUp) {
-                actions.showToast({text: `Found ${card.description}!`, isGood: true})
+                actions.showToast({ text: `Found ${card.description}!`, isGood: true })
                 await delay(TOAST_TIMEOUT / 2)
                 actions.removeCards([card, twinCard])
             } else {
-                actions.showToast({text: `Aww... try again!`, isGood: false})
+                actions.showToast({ text: `Aww... try again!`, isGood: false })
                 await delay(TOAST_TIMEOUT * 0.7)
                 actions.coverCards(upCards)
             }
@@ -83,8 +83,17 @@ class Card {
     }
 }
 
-export const fetchCards = thunk(async (actions, payload) => {
-    const response = await fetch(`/api/cards`)
+export const fetchCards = thunk(async (actions, payload, { getStoreState }) => {
+    let url = `/api/cards`
+    const { session: user = {}} = getStoreState()
+    
+    if(user.isInsideRoom){
+        url += `?roomId=${user.roomId}`
+    } else {
+        console.log('[fetch cards] user is fetching cards outside of room')
+    }
+
+    const response = await fetch(url)
     if (response.ok) {
         const result = await response.json();
         actions.setCards(result)

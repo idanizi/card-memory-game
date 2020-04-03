@@ -42,27 +42,44 @@ class Card {
 }
 
 app.get('/api/cards', async (req, res) => {
-    try {
-        const response = await fetch(
-            `https://api.unsplash.com/photos/`
-            + `?client_id=${process.env.UNSPLASH_ACCESS_KEY}`
-            + `&per_page=${parseInt(process.env.CARDS_COUNT) / 2}`)
+    const { roomId } = req.query;
 
-        if (response.ok) {
-            const result = await response.json()
-            let cards = result.map((photo, index) => new Card(photo.id, index, photo.urls.small, photo.alt_description))
-            cards = [...cards, ...result.map((photo, index) => new Card(photo.id, index + cards.length, photo.urls.small, photo.alt_description))]
-            cards = _.shuffle(cards)
-            return res.status(200).json(cards)
-        } else {
-            const message = `response is not ok ` +
-                `status: ${response.status} ${response.text}`;
-            console.log({ message, response })
-            return res.status(500).send(`[unsplash service failed] ${message}`)
+    if (!(roomId in rooms)) {
+        return res.status(400).send(`room id ${roomId} not exists`)
+    }
+
+    if (rooms[roomId].cards && rooms[roomId].cards.length > 0) {
+        console.log(`[/api/cards] using cards of room id=${roomId}`)
+        return res.status(200).json(rooms[roomId].cards)
+    }
+
+    else {
+        try {
+            const response = await fetch(
+                `https://api.unsplash.com/photos/`
+                + `?client_id=${process.env.UNSPLASH_ACCESS_KEY}`
+                + `&per_page=${parseInt(process.env.CARDS_COUNT) / 2}`)
+
+            if (response.ok) {
+                const result = await response.json()
+                let cards = result.map((photo, index) => new Card(photo.id, index, photo.urls.small, photo.alt_description))
+                cards = [...cards, ...result.map((photo, index) => new Card(photo.id, index + cards.length, photo.urls.small, photo.alt_description))]
+                cards = _.shuffle(cards)
+
+                console.log('[/api/cards] cards override')
+                rooms[roomId].cards = cards;
+
+                return res.status(200).json(cards)
+            } else {
+                const message = `response is not ok ` +
+                    `status: ${response.status} ${response.text}`;
+                console.log({ message, response })
+                return res.status(500).send(`[unsplash service failed] ${message}`)
+            }
+        } catch (error) {
+            console.log('[get /api/cards]', error);
+            return res.status(500).send('Server Error');
         }
-    } catch (error) {
-        console.log('[get /api/cards]', error);
-        return res.status(500).send('Server Error');
     }
 })
 

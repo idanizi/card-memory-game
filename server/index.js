@@ -6,7 +6,7 @@ const server = http.Server(app);
 const io = require('socket.io')(server);
 const morgan = require('morgan');
 const fetch = require('node-fetch')
-const uuid = require('uuid/v4');
+const { v4: uuid } = require('uuid');
 const _ = require('lodash')
 
 const rooms = {};
@@ -46,18 +46,18 @@ app.get('/api/cards', async (req, res) => {
         const response = await fetch(
             `https://api.unsplash.com/photos/`
             + `?client_id=${process.env.UNSPLASH_ACCESS_KEY}`
-            + `&per_page=${process.env.CARDS_COUNT / 2}`)
+            + `&per_page=${parseInt(process.env.CARDS_COUNT) / 2}`)
 
         if (response.ok) {
             const result = await response.json()
             let cards = result.map((photo, index) => new Card(photo.id, index, photo.urls.small, photo.alt_description))
             cards = [...cards, ...result.map((photo, index) => new Card(photo.id, index + cards.length, photo.urls.small, photo.alt_description))]
             cards = _.shuffle(cards)
-            return res.json(cards)
+            return res.status(200).json(cards)
         } else {
-            const message = `response is not ok` +
+            const message = `response is not ok ` +
                 `status: ${response.status} ${response.text}`;
-            console.log(message)
+            console.log({ message, response })
             return res.status(500).send(`[unsplash service failed] ${message}`)
         }
     } catch (error) {

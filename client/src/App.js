@@ -23,7 +23,6 @@ export default function App() {
           ? <GameOver />
           : <CardsSection />
       }
-      {/* <SocketTest /> */}
       <Footer />
     </main>
   );

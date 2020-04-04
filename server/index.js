@@ -141,6 +141,10 @@ io.on('connection', function (socket) {
         }
     })
 
+    socket.on('flip', (cardId) => {
+
+    })
+
 });
 
 //#endregion

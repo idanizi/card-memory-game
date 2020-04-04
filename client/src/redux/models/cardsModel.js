@@ -6,6 +6,15 @@ import { delay } from '../../util'
 export let items = []
 export let toastText = ''
 
+export const tryFlipCard = thunk((actions, payload, { getStoreState }) => {
+    const {session: user = {}} = getStoreState();
+    if(user.isMyTurn){
+        actions.flipCard(payload)
+    } else {
+        actions.showToast({text: 'Wait for your turn.'})
+    }
+})
+
 export const flipCard = action((state, payload) => {
     if (state.items.filter(x => x.isActive && x.isUp).length >= 2)
         return;
@@ -85,9 +94,9 @@ class Card {
 
 export const fetchCards = thunk(async (actions, payload, { getStoreState }) => {
     let url = `/api/cards`
-    const { session: user = {}} = getStoreState()
-    
-    if(user.isInsideRoom){
+    const { session: user = {} } = getStoreState()
+
+    if (user.isInsideRoom) {
         url += `?roomId=${user.roomId}`
     } else {
         console.log('[fetch cards] user is fetching cards outside of room')

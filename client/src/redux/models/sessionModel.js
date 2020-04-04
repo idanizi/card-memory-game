@@ -13,6 +13,11 @@ export const isConnected = false;
 export const isAwaitingOtherPlayer = false;
 export const opponent = { id: '', userName: '' };
 export const isInsideRoom = false;
+export const isMyTurn = false;
+
+export const setIsMyTurn = action((state, payload) => {
+    state.isMyTurn = payload;
+})
 
 export const fetchAvailableRooms = thunk(async (actions) => {
     console.log(`[fetchAvailableRooms] in`)
@@ -95,6 +100,11 @@ export const connect = thunk((actions) => {
 
     socket.on('error', error => {
         console.log(error) // todo: notify the user
+    })
+
+    socket.on('turn_change', (isMyTurn) => {
+        console.log(`[turn_change]`, { isMyTurn });
+        actions.setIsMyTurn(isMyTurn);
     })
 
     actions.setSocket(socket);

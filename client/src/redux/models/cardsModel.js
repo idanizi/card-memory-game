@@ -7,6 +7,7 @@ export let items = []
 export let toastText = ''
 
 export const tryFlipCard = thunk((actions, payload, { getStoreState, getStoreActions }) => {
+    console.log('[tryFlipCard]', { payload })
     const { session: user = {} } = getStoreState();
     if (user.isMyTurn) {
         actions.flipCard(payload) // payload := card.id
@@ -18,17 +19,19 @@ export const tryFlipCard = thunk((actions, payload, { getStoreState, getStoreAct
 })
 
 export const bumpMoves = action((state) => {
+    console.log('[bumpMoves]')
     state.moves++;
 })
 
 export const setCardIsUp = action((state, payload) => {
+    console.log('[setCardIsUp]', { payload })
     const { id, isUp } = payload;
     const card = state.items.find(x => x.id === id)
     card.isUp = isUp;
-    return { ...state, items: [...state.items] }
 })
 
 export const flipCard = thunk((actions, payload, { getState }) => {
+    console.log('[flipCard]', { payload })
     const state = getState();
 
     if (state.items.filter(x => x.isActive && x.isUp).length >= 2) {

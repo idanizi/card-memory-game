@@ -99,6 +99,8 @@ io.on('connection', function (socket) {
         socket.join(roomId);
         socket.emit('roomId', roomId, rooms[roomId].users.length);
         socket.send(`joined room ${roomName} = ${roomId}, awaiting another player to join`)
+
+        socket.emit('turn_change', true)
     })
 
     socket.on('join_room', function (roomId, userName) {
@@ -141,10 +143,17 @@ io.on('connection', function (socket) {
         }
     })
 
-    socket.on('flip', (cardId) => {
-
+    socket.on('flip_card', (roomId, cardId) => {
+        console.log('[flip_card]', {roomId, cardId})
+        const user = rooms[roomId].users.find(user => user.id === socket.id) || {};
+        socket.broadcast.to(roomId).emit('other_player_flip_card', user.name, cardId)
     })
 
+    socket.on('turn_end', (roomId) => {
+        console.log('[turn_end]', {roomId})
+        socket.broadcast.to(roomId).emit('turn_change', true)
+        socket.emit('turn_change', false)
+    })
 });
 
 //#endregion

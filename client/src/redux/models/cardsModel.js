@@ -6,10 +6,12 @@ import { delay } from '../../util'
 export let items = []
 export let toastText = ''
 
-export const tryFlipCard = thunk((actions, payload, { getStoreState }) => {
+export const tryFlipCard = thunk((actions, payload, { getStoreState, getStoreActions }) => {
     const { session: user = {} } = getStoreState();
     if (user.isMyTurn) {
-        actions.flipCard(payload)
+        actions.flipCard(payload) // payload := card.id
+        actions.bumpMoves()
+        getStoreActions().session.notifyFlipCard(payload)
     } else {
         actions.showToast({ text: 'Wait for your turn.' })
     }
@@ -19,9 +21,9 @@ export const bumpMoves = action((state) => {
     state.moves++;
 })
 
-export const setCardsCardIsUp = action((state, payload) => {
-    const { index, isUp } = payload;
-    const card = state.items.find(x => x.index === index)
+export const setCardIsUp = action((state, payload) => {
+    const { id, isUp } = payload;
+    const card = state.items.find(x => x.id === id)
     card.isUp = isUp;
     return { ...state, items: [...state.items] }
 })
@@ -33,9 +35,8 @@ export const flipCard = thunk((actions, payload, { getState }) => {
         return;
     }
 
-    actions.bumpMoves()
-    const index = payload;
-    actions.setCardsCardIsUp({ index, isUp: true });
+    const id = payload;
+    actions.setCardIsUp({ id, isUp: true });
 })
 
 export const removeCards = action((state, payload) => {
@@ -68,10 +69,10 @@ export const coverCards = action((state, payload) => {
 
 export const onFlipCard = thunkOn(
     actions => actions.flipCard,
-    async (actions, target, { getState }) => {
+    async (actions, target, { getState, getStoreActions }) => {
         const state = getState();
-        const index = target.payload;
-        const card = state.items.find(x => x.index === index)
+        const cardId = target.payload;
+        const card = state.items.find(x => x.id === cardId)
 
         const twinCard = state.items.find(x =>
             x !== card && x.id === card.id)
@@ -87,6 +88,8 @@ export const onFlipCard = thunkOn(
                 actions.showToast({ text: `Aww... try again!`, isGood: false })
                 await delay(TOAST_TIMEOUT * 0.7)
                 actions.coverCards(upCards)
+
+                getStoreActions().session.turnEnd()
             }
         }
     })

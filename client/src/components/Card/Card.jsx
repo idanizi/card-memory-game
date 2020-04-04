@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useStoreActions } from 'easy-peasy'
 
-function Card({ index, id, isUp, url, isActive, description }) {
+function Card({ id, isUp, url, isActive, description }) {
     const { tryFlipCard } = useStoreActions(actions => actions.cards)
     const [className, setClassName] = useState('')
 
@@ -9,8 +9,9 @@ function Card({ index, id, isUp, url, isActive, description }) {
         let str = ''
         if (isUp) {
             str += 'flip-up'
-            if (!isActive)
-            str += ' disabled'
+            if (!isActive) {
+                str += ' disabled'
+            }
         } else {
             str = 'flip-down'
         }
@@ -19,12 +20,12 @@ function Card({ index, id, isUp, url, isActive, description }) {
 
     return (
         <div
-            onClick={() => tryFlipCard(index)}
+            onClick={() => tryFlipCard(id)}
             className={"card " + className}
         >
             {isUp &&
                 <img src={url} alt={description} />
-                }
+            }
         </div>
     )
 }

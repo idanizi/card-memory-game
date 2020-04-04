@@ -78,7 +78,12 @@ export const notifyFlipCard = action((state, payload) => {
 })
 
 export const turnEnd = action((state) => {
-    console.log('[turnEnd]')
+    console.log('turnEnd')
+    state.isMyTurn = false;
+})
+
+export const onTurnEnd = actionOn(actions => actions.turnEnd, (state) => {
+    console.log('notifyTurnEnd')
     const { socket, roomId } = state;
     if (socket && roomId) {
         socket.emit('turn_end', roomId)

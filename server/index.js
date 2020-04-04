@@ -150,9 +150,9 @@ io.on('connection', function (socket) {
     })
 
     socket.on('turn_end', (roomId) => {
-        console.log('[turn_end]', {roomId})
+        const user = rooms[roomId].users.find(user => user.id === socket.id) || {};
+        console.log('[turn_end]', {roomId, userName: user.name})
         socket.broadcast.to(roomId).emit('turn_change', true)
-        socket.emit('turn_change', false)
     })
 });
 

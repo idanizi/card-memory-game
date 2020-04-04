@@ -72,7 +72,8 @@ export const coverCards = action((state, payload) => {
 
 export const onFlipCard = thunkOn(
     actions => actions.flipCard,
-    async (actions, target, { getState, getStoreActions }) => {
+    async (actions, target, { getState, getStoreActions, getStoreState }) => {
+        console.log('[onFlipCard]')
         const state = getState();
         const cardId = target.payload;
         const card = state.items.find(x => x.id === cardId)
@@ -92,7 +93,9 @@ export const onFlipCard = thunkOn(
                 await delay(TOAST_TIMEOUT * 0.7)
                 actions.coverCards(upCards)
 
-                getStoreActions().session.turnEnd()
+                if (getStoreState().session.isMyTurn) {
+                    getStoreActions().session.turnEnd()
+                }
             }
         }
     })

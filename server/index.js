@@ -143,15 +143,15 @@ io.on('connection', function (socket) {
         }
     })
 
-    socket.on('flip_card', (roomId, cardId) => {
-        console.log('[flip_card]', {roomId, cardId})
+    socket.on('flip_card', (roomId, cardIndex) => {
+        console.log('[flip_card]', { roomId, cardIndex })
         const user = rooms[roomId].users.find(user => user.id === socket.id) || {};
-        socket.broadcast.to(roomId).emit('other_player_flip_card', user.name, cardId)
+        socket.broadcast.to(roomId).emit('other_player_flip_card', user.name, cardIndex)
     })
 
     socket.on('turn_end', (roomId) => {
         const user = rooms[roomId].users.find(user => user.id === socket.id) || {};
-        console.log('[turn_end]', {roomId, userName: user.name})
+        console.log('[turn_end]', { roomId, userName: user.name })
         socket.broadcast.to(roomId).emit('turn_change', true)
     })
 });

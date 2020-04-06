@@ -71,9 +71,9 @@ export const setOpponent = action((state, payload) => {
 
 export const notifyFlipCard = action((state, payload) => {
     const { socket, roomId } = state;
-    const cardId = payload;
+    const cardIndex = payload;
     if (socket && roomId) {
-        socket.emit('flip_card', roomId, cardId)
+        socket.emit('flip_card', roomId, cardIndex)
     }
 })
 
@@ -119,9 +119,9 @@ export const connect = thunk((actions, payload, { getStoreActions }) => {
         shouldAwaitOtherPlayer(usersCountInRoom)
     })
 
-    socket.on('other_player_flip_card', (otherPlayerUserName, cardId) => {
-        console.log(`[other_player_flip_card]`, { otherPlayerUserName, cardId })
-        getStoreActions().cards.flipCard(cardId)
+    socket.on('other_player_flip_card', (otherPlayerUserName, cardIndex) => {
+        console.log(`[other_player_flip_card]`, { otherPlayerUserName, cardIndex })
+        getStoreActions().cards.flipCard(cardIndex)
     })
 
     socket.on('error', error => {

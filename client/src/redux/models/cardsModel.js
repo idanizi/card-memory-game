@@ -5,32 +5,37 @@ import { delay } from '../../util'
 
 export let items = []
 export let toastText = ''
+
 export let isTryingToFlipCard = false;
+export const setIsTryingToFlipCard = action((state, payload) => {
+    state.isTryingToFlipCard = payload;
+})
 
-export const onIsTryingToFlipCard = actionOn(
-    actions => [
-        actions.tryFlipCard,
-        actions.onFlipCard,
-    ],
-    (state, target) => {
-        const [tryFlipCard, onFlipCard] = target.resolvedTargets;
-        switch (target.type) {
-            case tryFlipCard:
-                state.isTryingToFlipCard = true;
-                break;
-            case onFlipCard:
-                state.isTryingToFlipCard = false;
-                break;
-            default: break;
-        }
-    }
-)
+// export const onIsTryingToFlipCard = actionOn(
+//     actions => [
+//         actions.tryFlipCard,
+//         actions.onFlipCard,
+//     ],
+//     (state, target) => {
+//         const [tryFlipCard, onFlipCard] = target.resolvedTargets;
+//         switch (target.type) {
+//             case tryFlipCard:
+//                 state.isTryingToFlipCard = true;
+//                 break;
+//             case onFlipCard:
+//                 state.isTryingToFlipCard = false;
+//                 break;
+//             default: break;
+//         }
+//     }
+// )
 
-export const tryFlipCard = thunk(async (actions, payload, { getStoreState, getStoreActions }) => {
+export const tryFlipCard = thunk((actions, payload, { getStoreState, getStoreActions }) => {
     console.log('[tryFlipCard]', { payload })
     const { session: user = {} } = getStoreState();
     if (user.isMyTurn) {
-        actions.flipCard(payload) // payload := card.id
+        actions.setIsTryingToFlipCard(true);
+        actions.flipCard(payload) // payload := card.index
         actions.bumpMoves()
         getStoreActions().session.notifyFlipCard(payload)
     } else {
@@ -45,8 +50,14 @@ export const bumpMoves = action((state) => {
 
 export const setCardIsUp = action((state, payload) => {
     console.log('[setCardIsUp]', { payload })
-    const { id, isUp } = payload;
-    const card = state.items.find(x => x.id === id)
+    const { index, isUp } = payload;
+    const card = state.items.find(card => card.index === index);
+
+    if (!card) {
+        console.log(`[setCardIsUp] card index ${index} not found.`);
+        return;
+    }
+
     card.isUp = isUp;
 })
 
@@ -58,39 +69,50 @@ export const flipCard = thunk((actions, payload, { getState }) => {
         return;
     }
 
-    const id = payload;
-    actions.setCardIsUp({ id, isUp: true });
+    const index = payload;
+    actions.setCardIsUp({ index, isUp: true });
 })
 
 export const onFlipCard = thunkOn(
     actions => actions.flipCard,
     async (actions, target, { getState, getStoreActions, getStoreState, meta, injections }) => {
         console.log('[onFlipCard]')
-        const state = getState();
-        const cardId = target.payload;
-        const card = state.items.find(x => x.id === cardId)
+        const index = target.payload;
+        const card = getState().items.find(card => card.index === index);
 
-        const twinCard = state.items.find(x =>
-            x !== card && x.id === card.id)
+        if (!card) {
+            console.log(`[onFlipCard] card index ${index} not found.`);
+            return;
+        }
 
-        const upCards = state.items.filter(x => x.isUp && x.isActive);
+        const twinCard = getState().items.find(x => x !== card && x.id === card.id)
+
+        const upCards = getState().items.filter(x => x.isUp && x.isActive);
 
         if (upCards.length >= 2) {
             if (twinCard?.isUp && card.isUp) {
-                actions.showToast({ text: `Found ${card.description}!`, isGood: true })
+                const text = `${getStoreState().session.isMyTurn ? "You" : "He"} found ${card.description}!`
+                actions.showToast({ text, isGood: getStoreState().session.isMyTurn })
                 await delay(TOAST_TIMEOUT / 2)
                 actions.removeCards([card, twinCard])
             } else {
-                actions.showToast({ text: `Aww... try again!`, isGood: false })
+                const text = getStoreState().session.isMyTurn ?
+                    `You are wrong! Turn passes to opponent...`
+                    :
+                    `He is wrong. Your turn now...`
+
+                actions.showToast({ text, isGood: !getStoreState().session.isMyTurn })
                 await delay(TOAST_TIMEOUT * 0.7)
                 actions.coverCards(upCards)
 
-                if (getStoreState().session.isMyTurn && state.isTryingToFlipCard) {
+                if (getStoreState().session.isMyTurn && getState().isTryingToFlipCard) {
                     console.log('[onFlipCard]', { meta, injections })
                     getStoreActions().session.turnEnd()
                 }
             }
         }
+
+        actions.setIsTryingToFlipCard(false)
     })
 
 export const removeCards = action((state, payload) => {

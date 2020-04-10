@@ -12,8 +12,10 @@ const _ = require('lodash')
 const rooms = {};
 const MAX_PLAYERS_COUNT = 2;
 
-server.listen(process.env.PORT, function () {
-    console.log(`listening on ${process.env.PORT}`);
+const port = process.env.API_PORT
+
+server.listen(port, function () {
+    console.log(`listening on ${port}`);
 });
 
 app.use(morgan("common"));

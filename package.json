@@ -14,7 +14,7 @@
     "dev-client": "npm --prefix=client start",
     "dev": "run-p dev-server dev-client",
     "start-server": "npm --prefix=server start",
-    "start-client": "http-server ./client/build --proxy http://localhost:8000",
+    "start-client": "http-server ./client/build -P http://localhost:8080?",
     "start": "run-p start-server start-client",
     "build-client": "npm --prefix=client run build",
     "build-server": "npm --prefix=server run build",

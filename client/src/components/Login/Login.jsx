@@ -120,6 +120,14 @@ export default function Login() {
 
     return (
         <main className="login">
+            <button onClick={() => {
+                fetch('/api/ping')
+                    .then(res => res.text())
+                    .then(res => console.log(res))
+            }
+            }>
+                test
+            </button>
             <section>
                 <header>
                     <h1>Card Memory Game</h1>

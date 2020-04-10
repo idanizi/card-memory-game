@@ -26,6 +26,10 @@ function getAvailableRooms(rooms) {
 
 //#region REST
 
+app.get('/api/ping', (req, res) => {
+    res.status(200).end('pong!');
+})
+
 app.get('/api/rooms', function (req, res) {
     res.json({ all_rooms: rooms, available: getAvailableRooms(rooms) });
 });

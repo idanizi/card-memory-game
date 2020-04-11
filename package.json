@@ -21,7 +21,7 @@
     "build": "run-s build-client build-server",
     "version-client": "npm --prefix=client version ${npm_package_version}",
     "version-server": "npm --prefix=server version ${npm_package_version}",
-    "version": "run-s version-client version-server",
+    "version": "run-s version-client version-server && git add .",
     "postversion": "git push --all && git push --tags"
   },
   "keywords": [],

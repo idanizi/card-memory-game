@@ -15,7 +15,7 @@
     "dev": "run-p dev-server dev-client",
     "start-server": "npm --prefix=server start",
     "start-client": "node ./index.js",
-    "start": "run-p start-server start-client",
+    "start": "npm run start-client",
     "build-client": "npm --prefix=client run build",
     "build-server": "npm --prefix=server run build",
     "build": "run-s build-client build-server",

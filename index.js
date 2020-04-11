@@ -7,9 +7,9 @@ const proxyProt = 8000;
 
 const app = express();
 
-// app.use(express.static(path.join(__dirname, 'client', 'build')))
+app.use(express.static(path.join(__dirname, 'client', 'build')))
 
-app.use(['/api/*', '/socket*'], createProxyMiddleware({ target: `http://localhost:${proxyProt}`, changeOrigin: true }));
+// app.use(['/api/*', '/socket*'], createProxyMiddleware({ target: `http://localhost:${proxyProt}`, changeOrigin: true }));
 
 app.get('/*', (req, res) => {
     res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'))

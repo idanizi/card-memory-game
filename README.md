@@ -3,7 +3,7 @@ Card memory game as part of the apps ideas challenge
 
 see this [project definition](https://github.com/florinpop17/app-ideas/blob/master/Projects/2-Intermediate/Card-Memory-Game.md)
 
-see [live demo](http://idanizi.github.io/card-memory-game)
+see [live demo](https://card-memory-game-app-2.herokuapp.com/)
 
 ## Getting started
 

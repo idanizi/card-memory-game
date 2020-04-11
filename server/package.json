@@ -1,6 +1,6 @@
 {
   "name": "card-memory-game-server",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "card memory game multiplayer socket.io server",
   "main": "index.js",
   "scripts": {

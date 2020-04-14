@@ -1,6 +1,7 @@
 import { thunk, thunkOn, action, actionOn } from 'easy-peasy'
 import _ from 'lodash'
 import io from 'socket.io-client'
+import { v4 as uuid } from 'uuid'
 
 const MINIMUM_PAYERS_COUNT_TO_PLAY = 2;
 
@@ -14,6 +15,17 @@ export const isAwaitingOtherPlayer = false;
 export const opponent = { id: '', userName: '' };
 export const isInsideRoom = false;
 export const isMyTurn = false;
+export const sessionId = '';
+export const userId = '';
+
+export const setSessionId = action((state, payload) => {
+    state.sessionId = payload;
+})
+
+export const setUserId = action((state, payload) => {
+    state.userId = payload;
+})
+
 
 export const setIsMyTurn = action((state, payload) => {
     state.isMyTurn = payload;
@@ -90,16 +102,63 @@ export const onTurnEnd = actionOn(actions => actions.turnEnd, (state) => {
     }
 })
 
-export const connect = thunk((actions, payload, { getStoreActions }) => {
-    let socket = window.sessionStorage.getItem('socket')
-    if (!socket) {
-        socket = io();
-        window.sessionStorage.setItem('socket', JSON.stringify(socket))
-        console.log('creating a new socket', socket)
-    } else {
-        socket = JSON.parse(socket)
+async function createNewUser(name, sessionId) {
+    try {
+        const request = await fetch(`/api/user`, {
+            method: "post",
+            body: {
+                name,
+                sessionId,
+            }
+        })
+
+        if (request.ok) {
+            const userId = (await request.json())?.userId
+            console.log('[createNewUser]', { userId })
+            return userId;
+        }
+
+        console.log('[createNewUser] error: user not created.', { request })
+    } catch (error) {
+        console.log('[createNewUser]', error)
+    }
+}
+
+async function updateUserSessionId(userId, sessionId) {
+    try {
+        const request = await fetch(`/api/user/${userId}`, {
+            method: "patch",
+            body: {
+                sessionId,
+            }
+        })
+
+        if (request.ok) {
+            console.log('[updateUserSessionId]', { userId, sessionId })
+            return;
+        }
+
+        console.log('[updateUserSessionId] failed', { request })
+    } catch (error) {
+        console.log('[updateUserSessionId]', error)
+    }
+}
+
+export const connect = thunk(async (actions, payload, { getStoreActions, getState }) => {
+    console.log('[connect] start')
+    
+    if (_.isEmpty(getState().sessionId)) {
+        actions.setSessionId(uuid())
+
+        if (_.isEmpty(getState().userId)) {
+            const userId = await createNewUser(getState().userName, getState().sessionId)
+            actions.setUserId(userId) // todo: persist userId to cookie
+        } else {
+            await updateUserSessionId(getState().userId, getState().sessionId)
+        }
     }
 
+    const socket = io()
 
     const shouldAwaitOtherPlayer = usersCountInRoom => {
         if (usersCountInRoom < MINIMUM_PAYERS_COUNT_TO_PLAY) {
@@ -147,9 +206,9 @@ export const connect = thunk((actions, payload, { getStoreActions }) => {
 
 export const createRoom = action((state, payload) => {
     const roomName = payload;
-    const { userName } = state;
+    const { userId } = state;
     if (state.socket)
-        state.socket.emit('create_room', roomName, userName)
+        state.socket.emit('create_room', roomName, userId)
 })
 
 export const leaveRoom = action((state) => {
@@ -160,9 +219,9 @@ export const leaveRoom = action((state) => {
 
 export const joinRoom = action((state, payload) => {
     const roomId = payload;
-    const { socket, userName } = state;
+    const { socket, userId } = state;
     if (socket)
-        socket.emit('join_room', roomId, userName);
+        socket.emit('join_room', roomId, userId);
 })
 
 export const onIsInsideRoomChange = actionOn(

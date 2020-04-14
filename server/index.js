@@ -8,6 +8,7 @@ const morgan = require('morgan');
 const fetch = require('node-fetch')
 const { v4: uuid } = require('uuid');
 const _ = require('lodash')
+const bodyParser = require('body-parser')
 
 const rooms = {};
 const users = {};
@@ -20,6 +21,7 @@ server.listen(port, function () {
 });
 
 app.use(morgan("common"));
+app.use(bodyParser.json());
 
 function getAvailableRooms(rooms) {
     return Object.entries(rooms)

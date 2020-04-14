@@ -48,9 +48,11 @@ class Card {
 }
 
 class User {
-    constructor({ id, name }) {
+    constructor({ id, name, sessionId, socketId }) {
         this.id = id;
         this.name = name;
+        this.sessionId = sessionId;
+        this.socketId = socketId;
     }
 }
 
@@ -121,7 +123,7 @@ io.on('connection', function (socket) {
 
         if (roomId in rooms) {
             socket.join(roomId)
-            rooms[roomId].users.push({ id: socket.id, name: userName })
+            rooms[roomId].users.push(new User({ id: socket.id, name: userName }))
 
             socket.emit('roomId', roomId, rooms[roomId].users.length);
             socket.broadcast.to(roomId).emit('other_player_join', socket.id, userName, rooms[roomId].users.length);

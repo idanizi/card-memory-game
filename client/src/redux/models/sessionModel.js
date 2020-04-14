@@ -144,19 +144,62 @@ async function updateUserSessionId(userId, sessionId) {
     }
 }
 
+async function isSessionIdValid(sessionId) {
+    // todo: isSessionIdValid - fetch user by session id and check if response ok
+    return true;
+}
+
+async function isUserIdValid(userId) {
+    // todo: isUserIdValid
+    return true;
+}
+
 export const connect = thunk(async (actions, payload, { getStoreActions, getState }) => {
     console.log('[connect] start')
-    
+
     if (_.isEmpty(getState().sessionId)) {
         actions.setSessionId(uuid())
 
         if (_.isEmpty(getState().userId)) {
             const userId = await createNewUser(getState().userName, getState().sessionId)
             actions.setUserId(userId) // todo: persist userId to cookie
-        } else {
+        }
+        else {
             await updateUserSessionId(getState().userId, getState().sessionId)
         }
     }
+
+    // TODO: IDAN CONTINUE FROM HERE
+
+    else { // session id exists on client side - we need to check it
+        if (isSessionIdValid(getState().sessionId)) {
+            if (_.isEmpty(getState().userId)) {
+                // todo: get from the server user id and update state
+            }
+            else {
+                // nothing - all good.
+            }
+        }
+
+        else { // session id is invalid
+
+            if (_.isEmpty(getState().userId)) {
+                // logout the user - will make him login again
+                actions.setIsConnected(false)
+            }
+            else {
+                actions.setSessionId(uuid())
+                
+                if (isUserIdValid(getState().userId)) {
+                    // nothing - all good
+                }
+                else {
+
+                }
+            }
+        }
+    }
+
 
     const socket = io()
 

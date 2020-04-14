@@ -91,7 +91,15 @@ export const onTurnEnd = actionOn(actions => actions.turnEnd, (state) => {
 })
 
 export const connect = thunk((actions, payload, { getStoreActions }) => {
-    const socket = io();
+    let socket = window.sessionStorage.getItem('socket')
+    if (!socket) {
+        socket = io();
+        window.sessionStorage.setItem('socket', JSON.stringify(socket))
+        console.log('creating a new socket', socket)
+    } else {
+        socket = JSON.parse(socket)
+    }
+
 
     const shouldAwaitOtherPlayer = usersCountInRoom => {
         if (usersCountInRoom < MINIMUM_PAYERS_COUNT_TO_PLAY) {

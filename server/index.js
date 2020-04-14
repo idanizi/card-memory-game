@@ -47,6 +47,13 @@ class Card {
     }
 }
 
+class User {
+    constructor({ id, name }) {
+        this.id = id;
+        this.name = name;
+    }
+}
+
 app.get('/api/cards', async (req, res) => {
     const { roomId } = req.query;
 
@@ -101,7 +108,7 @@ io.on('connection', function (socket) {
         console.log('create_room', { roomName, userName })
 
         roomId = uuid();
-        rooms[roomId] = { users: [{ id: socket.id, name: userName }], name: roomName };
+        rooms[roomId] = { users: [new User({ id: socket.id, name: userName })], name: roomName };
         socket.join(roomId);
         socket.emit('roomId', roomId, rooms[roomId].users.length);
         socket.send(`joined room ${roomName} = ${roomId}, awaiting another player to join`)

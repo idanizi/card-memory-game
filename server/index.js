@@ -10,6 +10,7 @@ const { v4: uuid } = require('uuid');
 const _ = require('lodash')
 
 const rooms = {};
+const users = {};
 const MAX_PLAYERS_COUNT = 2;
 
 const port = process.env.API_PORT
@@ -29,7 +30,7 @@ function getAvailableRooms(rooms) {
 //#region REST
 
 app.get('/api/ping', (req, res) => {
-    res.status(200).end('pong!');
+    res.end('pong!');
 })
 
 app.get('/api/rooms', function (req, res) {
@@ -49,9 +50,15 @@ class Card {
 
 class User {
     constructor({ id, name, sessionId, socketId }) {
+        /** cookie id, database */
         this.id = id;
+
         this.name = name;
+
+        /** created at the client */
         this.sessionId = sessionId;
+
+        /** current socket connection id */
         this.socketId = socketId;
     }
 }
@@ -65,7 +72,7 @@ app.get('/api/cards', async (req, res) => {
 
     if (rooms[roomId].cards && rooms[roomId].cards.length > 0) {
         console.log(`[/api/cards] using cards of room id=${roomId}`)
-        return res.status(200).json(rooms[roomId].cards)
+        return res.json(rooms[roomId].cards)
     }
 
     else {
@@ -84,7 +91,7 @@ app.get('/api/cards', async (req, res) => {
                 console.log('[/api/cards] cards override')
                 rooms[roomId].cards = cards;
 
-                return res.status(200).json(cards)
+                return res.json(cards)
             } else {
                 const message = `response is not ok ` +
                     `status: ${response.status} ${response.text}`;
@@ -98,13 +105,27 @@ app.get('/api/cards', async (req, res) => {
     }
 })
 
+app.post('/api/user', (req, res) => {
+    const { name, sessionId } = req.body
+    const userId = uuid();
+    users[userId] = new User({ id: userId, name, sessionId })
+    res.json({ userId });
+})
+
+app.patch('/api/user/:userId', (req, res) => {
+    const { userId } = req.params
+    const { sessionId } = req.body
+    users[userId].sessionId = sessionId
+    res.end()
+})
+
 //#endregion
 
 //#region socket.io
 
 io.on('connection', function (socket) {
     console.log(`user ${socket.id} connected`);
-    socket.send(`welcome, user id: ${socket.id}`)
+    socket.send(`welcome, user id: ${socket.id}`);
 
     socket.on('create_room', function (roomName, userName) {
         console.log('create_room', { roomName, userName })

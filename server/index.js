@@ -119,6 +119,23 @@ app.patch('/api/user/:userId', (req, res) => {
     res.end()
 })
 
+app.get('/api/user', (req, res) => {
+    const { sessionId, userId } = req.query
+    if (sessionId || userId) {
+        const user = Object.values(users).find(x => sessionId ? x.sessionId === sessionId : x.userId === userId)
+        if (user) {
+            res.json(user);
+        } else {
+            console.log(`[GET user] cannot find`, { sessionId, userId })
+            res.status(404).send('cannot find user')
+        }
+    } else {
+        console.log(`[GET user] missing parameters`, { query: req.query })
+        return res.status(400).send('Missing query parameters sessionId or userId')
+    }
+
+})
+
 //#endregion
 
 //#region socket.io
@@ -127,11 +144,21 @@ io.on('connection', function (socket) {
     console.log(`user ${socket.id} connected`);
     socket.send(`welcome, user id: ${socket.id}`);
 
-    socket.on('create_room', function (roomName, userName) {
-        console.log('create_room', { roomName, userName })
+    socket.on('create_room', function (roomName, userId) {
+        const user = users[userId]
+
+        if (!user) {
+            const message = `no such userId ${userId}`
+            console.log(message)
+            socket.error(message)
+            return;
+        }
+
+        console.log('create_room', { roomName, user })
 
         roomId = uuid();
-        rooms[roomId] = { users: [new User({ id: socket.id, name: userName })], name: roomName };
+        rooms[roomId] = { users: [user], name: roomName };
+
         socket.join(roomId);
         socket.emit('roomId', roomId, rooms[roomId].users.length);
         socket.send(`joined room ${roomName} = ${roomId}, awaiting another player to join`)
@@ -139,17 +166,26 @@ io.on('connection', function (socket) {
         socket.emit('turn_change', true)
     })
 
-    socket.on('join_room', function (roomId, userName) {
-        console.log('join_room', { roomId, userName })
+    socket.on('join_room', function (roomId, userId) {
+        const user = users[userId]
+
+        if (!user) {
+            const message = `no such userId ${userId}`
+            console.log(message)
+            socket.error(message)
+            return;
+        }
+
+        console.log('join_room', { roomId, user })
 
         if (roomId in rooms) {
             socket.join(roomId)
-            rooms[roomId].users.push(new User({ id: socket.id, name: userName }))
+            rooms[roomId].users.push(user)
 
             socket.emit('roomId', roomId, rooms[roomId].users.length);
-            socket.broadcast.to(roomId).emit('other_player_join', socket.id, userName, rooms[roomId].users.length);
+            socket.broadcast.to(roomId).emit('other_player_join', socket.id, user.name, rooms[roomId].users.length);
 
-            socket.broadcast.to(roomId).send(`${userName} joined!`)
+            socket.broadcast.to(roomId).send(`${userId} joined!`)
             socket.send(`you joined to room ${rooms[roomId].name}.`)
         } else {
             const message = `no such room ${roomId}`
@@ -158,12 +194,12 @@ io.on('connection', function (socket) {
         }
     })
 
-    socket.on('leave_room', function (roomId) {
+    socket.on('leave_room', function (roomId) { // todo: test this
         console.log('leave_room', { roomId })
 
         if (roomId in rooms) {
             socket.leave(roomId)
-            const user = rooms[roomId].users.splice(rooms[roomId].users.findIndex(x => x.id === socket.id), 1)
+            const user = rooms[roomId].users.splice(rooms[roomId].users.findIndex(user => user.socketId === socket.id), 1)
 
             if (rooms[roomId].users.length === 0) {
                 delete rooms[roomId];
@@ -181,12 +217,12 @@ io.on('connection', function (socket) {
 
     socket.on('flip_card', (roomId, cardIndex) => {
         console.log('[flip_card]', { roomId, cardIndex })
-        const user = rooms[roomId].users.find(user => user.id === socket.id) || {};
+        const user = rooms[roomId].users.find(user => user.socketId === socket.id) || {};
         socket.broadcast.to(roomId).emit('other_player_flip_card', user.name, cardIndex)
     })
 
     socket.on('turn_end', (roomId) => {
-        const user = rooms[roomId].users.find(user => user.id === socket.id) || {};
+        const user = rooms[roomId].users.find(user => user.socketId === socket.id) || {};
         console.log('[turn_end]', { roomId, userName: user.name })
         socket.broadcast.to(roomId).emit('turn_change', true)
     })

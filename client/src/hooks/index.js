@@ -12,3 +12,21 @@ export function useCards() {
 
     return { items }
 }
+
+export function useReconnect() {
+    const { connect } = useStoreActions(actions => actions.session)
+    const { isConnected, socket } = useStoreState(state => state.session)
+
+    useEffect(() => {
+
+        if(!socket && isConnected){
+            console.log('[useReconnect]', 'reconnecting')
+            connect()
+        }
+
+        return () => {
+            console.log('[useReconnect]', 'unmounted -> disconnecting')
+            // todo: disconnect socket from server
+        }
+    }, [isConnected, connect, socket])
+}

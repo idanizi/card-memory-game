@@ -19,6 +19,7 @@ export const sessionId = '';
 export const userId = '';
 
 export const setSessionId = action((state, payload) => {
+    console.log('[setSessionId]', { payload })
     state.sessionId = payload;
 })
 
@@ -154,6 +155,11 @@ async function isUserIdValid(userId) {
     return true;
 }
 
+async function getUserIdBySessionId(sessionId) {
+    // todo: getUserIdBySessionId
+    return "";
+}
+
 export const connect = thunk(async (actions, payload, { getStoreActions, getState }) => {
     console.log('[connect] start')
 
@@ -161,40 +167,48 @@ export const connect = thunk(async (actions, payload, { getStoreActions, getStat
         actions.setSessionId(uuid())
 
         if (_.isEmpty(getState().userId)) {
+            console.log('[connect]', 'no sessionId and no userId === first time login')
             const userId = await createNewUser(getState().userName, getState().sessionId)
             actions.setUserId(userId) // todo: persist userId to cookie
         }
         else {
+            console.log("[connect]", "no sessionId and userId existed, needs to update new sessionId")
             await updateUserSessionId(getState().userId, getState().sessionId)
         }
     }
 
-    // TODO: IDAN CONTINUE FROM HERE
+    else {
+        console.log("[connect]", "session id exists on client side - we need to check it")
 
-    else { // session id exists on client side - we need to check it
         if (isSessionIdValid(getState().sessionId)) {
             if (_.isEmpty(getState().userId)) {
-                // todo: get from the server user id and update state
+                console.log("[connect]", "sessionId is valid but no userId")
+                const userId = getUserIdBySessionId(getState().sessionId)
+                setUserId(userId)
             }
             else {
-                // nothing - all good.
+                console.log("[connect]", "sessionId & userId valid, all good.")
             }
         }
 
-        else { // session id is invalid
-
+        else {
             if (_.isEmpty(getState().userId)) {
-                // logout the user - will make him login again
+                console.log("[connect]", "session is invalid & userId is empty -> disconnect the user")
+                actions.setSessionId('')
                 actions.setIsConnected(false)
             }
             else {
                 actions.setSessionId(uuid())
-                
+
                 if (isUserIdValid(getState().userId)) {
-                    // nothing - all good
+                    console.log("[connect]", "userId valid but sessionId was invalid -> update sessionId")
+                    updateUserSessionId(getState().userId, getState().sessionId)
                 }
                 else {
-
+                    console.log("[connect]", "sessionId & userId are invalid -> disconnect the user")
+                    actions.setUserId('')
+                    actions.setSessionId('')
+                    actions.setIsConnected(false)
                 }
             }
         }

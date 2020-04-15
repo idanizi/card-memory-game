@@ -81,7 +81,6 @@ function InviteSection() {
         if (!user.isInsideRoom && !requiredRoomId) {
             const roomName = uuid()
             createRoom(roomName)
-            console.log({ roomName })
         }
     }, [user.isInsideRoom])
 

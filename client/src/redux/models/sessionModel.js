@@ -146,18 +146,37 @@ async function updateUserSessionId(userId, sessionId) {
 }
 
 async function isSessionIdValid(sessionId) {
-    // todo: isSessionIdValid - fetch user by session id and check if response ok
-    return true;
+    try {
+        const response = await fetch(`/api/user?sessionId=${sessionId}`)
+        return response.ok;
+    } catch (error) {
+        console.log("[isSessionIdValid]", error)
+        return false;
+    }
 }
 
 async function isUserIdValid(userId) {
-    // todo: isUserIdValid
-    return true;
+    try {
+        const response = await fetch(`/api/user?userId=${userId}`)
+        return response.ok;
+    } catch (error) {
+        console.log("[isUserIdValid]", error)
+        return false;
+    }
 }
 
 async function getUserIdBySessionId(sessionId) {
-    // todo: getUserIdBySessionId
-    return "";
+    try {
+        const response = await fetch(`/api/user?sessionId=${sessionId}`)
+        if (response.ok) {
+            return (await response.json())?.id ?? '';
+        } else {
+            console.log('[getUserIdBySessionId]', 'response not ok', { response })
+        }
+    } catch (error) {
+        console.log('[getUserIdBySessionId]', error)
+        return '';
+    }
 }
 
 export const connect = thunk(async (actions, payload, { getStoreActions, getState }) => {

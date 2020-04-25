@@ -18,20 +18,21 @@ function App() {
 
   useReconnect()
 
-  if (!isConnected || !isInsideRoom || isAwaitingOtherPlayer) return <Login />
-
   return (
-    <main>
-      <header>
-        <Moves />
-      </header>
-      {
-        isGameOver
-          ? <GameOver />
-          : <CardsSection />
-      }
-      <Footer />
-    </main>
+    (!isConnected || !isInsideRoom || isAwaitingOtherPlayer) ?
+      <Login />
+      :
+      <main>
+        <header>
+          <Moves />
+        </header>
+        {
+          isGameOver
+            ? <GameOver />
+            : <CardsSection />
+        }
+        <Footer />
+      </main>
   );
 }
 

@@ -11,23 +11,25 @@ import { v4 as uuid } from 'uuid'
 import { delay } from '../../util'
 
 function UserNameInput() {
-    const { userName, } = useStoreState(state => state.session)
     const { setUserName, connect } = useStoreActions(actions => actions.session)
+
+    const [value, setValue] = useState('')
 
     const handleChangeUserName = e => {
         e.preventDefault()
-        setUserName(e.target.value)
+        setValue(e.target.value)
     }
 
     const handleEnter = e => {
         e.preventDefault()
+        setUserName(value)
         connect();
     }
 
     return (
         <article className="user-name-input">
             <TextField className="text-input" label={"User Name"} variant="outlined"
-                value={userName}
+                value={value}
                 onChange={handleChangeUserName}
                 onKeyUp={e => e.keyCode === 13 && handleEnter(e)} />
             <Button className="btn submit-button" variant="contained" color="primary"

@@ -92,6 +92,9 @@ export const onFlipCard = thunkOn(
         if (upCards.length >= 2) {
             if (twinCard?.isUp && card.isUp) {
                 const text = `${getStoreState().session.isMyTurn ? "You" : "He"} found ${card.description}!`
+                if(getStoreState().session.isMyTurn){
+                    actions.setPairs(getState().pairs + 1)
+                }
                 actions.showToast({ text, isGood: getStoreState().session.isMyTurn })
                 await delay(TOAST_TIMEOUT / 2)
                 actions.removeCards([card, twinCard])
@@ -224,3 +227,8 @@ export const onLoading = actionOn(
 export let isGameOver = false;
 export let isShowToast = false;
 export let moves = 0;
+
+export let pairs = 0;
+export const setPairs = action((state, payload) => {
+    state.pairs = payload
+})

@@ -1,6 +1,7 @@
 import { thunk, thunkOn, action, actionOn } from 'easy-peasy'
 import _ from 'lodash'
 import io from 'socket.io-client'
+import { v4 as uuid } from 'uuid'
 
 const MINIMUM_PAYERS_COUNT_TO_PLAY = 2;
 
@@ -14,6 +15,18 @@ export const isAwaitingOtherPlayer = false;
 export const opponent = { id: '', userName: '' };
 export const isInsideRoom = false;
 export const isMyTurn = false;
+export const sessionId = '';
+export const userId = '';
+
+export const setSessionId = action((state, payload) => {
+    console.log('[setSessionId]', { payload })
+    state.sessionId = payload;
+})
+
+export const setUserId = action((state, payload) => {
+    state.userId = payload;
+})
+
 
 export const setIsMyTurn = action((state, payload) => {
     state.isMyTurn = payload;
@@ -90,8 +103,138 @@ export const onTurnEnd = actionOn(actions => actions.turnEnd, (state) => {
     }
 })
 
-export const connect = thunk((actions, payload, { getStoreActions }) => {
-    const socket = io();
+async function createNewUser(name, sessionId) {
+    try {
+        const request = await fetch(`/api/user`, {
+            method: "post",
+            body: {
+                name,
+                sessionId,
+            }
+        })
+
+        if (request.ok) {
+            const userId = (await request.json())?.userId
+            console.log('[createNewUser]', { userId })
+            return userId;
+        }
+
+        console.log('[createNewUser] error: user not created.', { request })
+    } catch (error) {
+        console.log('[createNewUser]', error)
+    }
+}
+
+async function updateUserSessionId(userId, sessionId) {
+    try {
+        const request = await fetch(`/api/user/${userId}`, {
+            method: "patch",
+            body: {
+                sessionId,
+            }
+        })
+
+        if (request.ok) {
+            console.log('[updateUserSessionId]', { userId, sessionId })
+            return;
+        }
+
+        console.log('[updateUserSessionId] failed', { request })
+    } catch (error) {
+        console.log('[updateUserSessionId]', error)
+    }
+}
+
+async function isSessionIdValid(sessionId) {
+    try {
+        const response = await fetch(`/api/user?sessionId=${sessionId}`)
+        return response.ok;
+    } catch (error) {
+        console.log("[isSessionIdValid]", error)
+        return false;
+    }
+}
+
+async function isUserIdValid(userId) {
+    try {
+        const response = await fetch(`/api/user?userId=${userId}`)
+        return response.ok;
+    } catch (error) {
+        console.log("[isUserIdValid]", error)
+        return false;
+    }
+}
+
+async function getUserIdBySessionId(sessionId) {
+    try {
+        const response = await fetch(`/api/user?sessionId=${sessionId}`)
+        if (response.ok) {
+            return (await response.json())?.id ?? '';
+        } else {
+            console.log('[getUserIdBySessionId]', 'response not ok', { response })
+        }
+    } catch (error) {
+        console.log('[getUserIdBySessionId]', error)
+        return '';
+    }
+}
+
+export const connect = thunk(async (actions, payload, { getStoreActions, getState }) => {
+    console.log('[connect] start')
+
+    if (_.isEmpty(getState().sessionId)) {
+        actions.setSessionId(uuid())
+
+        if (_.isEmpty(getState().userId)) {
+            console.log('[connect]', 'no sessionId and no userId === first time login')
+            const userId = await createNewUser(getState().userName, getState().sessionId)
+            actions.setUserId(userId) // todo: persist userId to cookie
+        }
+        else {
+            console.log("[connect]", "no sessionId and userId existed, needs to update new sessionId")
+            await updateUserSessionId(getState().userId, getState().sessionId)
+        }
+    }
+
+    else {
+        console.log("[connect]", "session id exists on client side - we need to check it")
+
+        if (isSessionIdValid(getState().sessionId)) {
+            if (_.isEmpty(getState().userId)) {
+                console.log("[connect]", "sessionId is valid but no userId")
+                const userId = getUserIdBySessionId(getState().sessionId)
+                setUserId(userId)
+            }
+            else {
+                console.log("[connect]", "sessionId & userId valid, all good.")
+            }
+        }
+
+        else {
+            if (_.isEmpty(getState().userId)) {
+                console.log("[connect]", "session is invalid & userId is empty -> disconnect the user")
+                actions.setSessionId('')
+                actions.setIsConnected(false)
+            }
+            else {
+                actions.setSessionId(uuid())
+
+                if (isUserIdValid(getState().userId)) {
+                    console.log("[connect]", "userId valid but sessionId was invalid -> update sessionId")
+                    updateUserSessionId(getState().userId, getState().sessionId)
+                }
+                else {
+                    console.log("[connect]", "sessionId & userId are invalid -> disconnect the user")
+                    actions.setUserId('')
+                    actions.setSessionId('')
+                    actions.setIsConnected(false)
+                }
+            }
+        }
+    }
+
+
+    const socket = io()
 
     const shouldAwaitOtherPlayer = usersCountInRoom => {
         if (usersCountInRoom < MINIMUM_PAYERS_COUNT_TO_PLAY) {
@@ -139,9 +282,9 @@ export const connect = thunk((actions, payload, { getStoreActions }) => {
 
 export const createRoom = action((state, payload) => {
     const roomName = payload;
-    const { userName } = state;
+    const { userId } = state;
     if (state.socket)
-        state.socket.emit('create_room', roomName, userName)
+        state.socket.emit('create_room', roomName, userId)
 })
 
 export const leaveRoom = action((state) => {
@@ -152,9 +295,9 @@ export const leaveRoom = action((state) => {
 
 export const joinRoom = action((state, payload) => {
     const roomId = payload;
-    const { socket, userName } = state;
+    const { socket, userId } = state;
     if (socket)
-        socket.emit('join_room', roomId, userName);
+        socket.emit('join_room', roomId, userId);
 })
 
 export const onIsInsideRoomChange = actionOn(

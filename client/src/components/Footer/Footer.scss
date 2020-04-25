@@ -1,9 +1,8 @@
 @import "../../vars.scss";
 
 footer {
-    background: $light_orange;
-    text-align: center;
     grid-area: footer;
+    background: $light_orange;
     width: 100%;
     font-family: $font_annie;
     font-style: normal;

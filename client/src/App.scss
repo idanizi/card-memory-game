@@ -4,9 +4,18 @@ main {
     display: grid;
     gap: 1rem;
     grid-template:
-        "cards-section"1fr "footer"auto;
+        "header"auto "cards-section"1fr "footer"auto;
     height: 100vh;
+    width: 100vw;
     background-color: $light_blue;
+
+    // fixme: responsiveness - background color escaping out
+}
+
+@media screen and (max-width: 768px) {
+    footer {
+        grid-area: header;
+    }
 }
 
 button,
@@ -67,7 +76,7 @@ section.cards {
             flex-direction: column;
             justify-content: space-around;
 
-            & > * {
+            &>* {
                 z-index: 2;
                 position: relative;
             }

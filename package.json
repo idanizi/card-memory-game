@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "deploy": "git push heroku",
     "install-client": "npm --prefix=client install",
     "install-server": "npm --prefix=server install",
     "postinstall": "run-s install-client install-server",
